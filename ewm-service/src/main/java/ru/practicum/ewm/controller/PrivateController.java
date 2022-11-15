@@ -52,6 +52,14 @@ public class PrivateController {
         return privateService.getEventByUserIdAndEventId(userId, eventId);
     }
 
+    @GetMapping("/{userId}/events/{eventId}/requests")
+    public List<ParticipationRequestDto> getParticipationRequestsOfUser(@PathVariable Long userId, @PathVariable Long eventId) {
+        return privateService.getParticipationRequestsOfUser(userId, eventId);
+    }
+
+
+
+
     @PostMapping("/{userId}/requests")
     public ParticipationRequestDto createRequest(@PathVariable Long userId, @RequestParam Long eventId) {
         return privateService.createRequest(userId, eventId);

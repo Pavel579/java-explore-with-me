@@ -71,7 +71,7 @@ create table if not exists compilation_events
     compilation_id bigint
         constraint compilation_events_compilations_id_fk
             references compilations,
-    primary key (compilation_id, event_id)
+    primary key (event_id, compilation_id)
 );
 
 create table if not exists requests

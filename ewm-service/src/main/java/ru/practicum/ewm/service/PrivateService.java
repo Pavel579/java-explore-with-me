@@ -20,4 +20,6 @@ public interface PrivateService {
     List<ParticipationRequestDto> getUserRequests(Long userId);
 
     ParticipationRequestDto cancelRequest(Long userId, Long requestId);
+
+    List<ParticipationRequestDto> getParticipationRequestsOfUser(Long userId, Long eventId);
 }

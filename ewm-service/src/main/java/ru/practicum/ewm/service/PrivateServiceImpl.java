@@ -96,4 +96,10 @@ public class PrivateServiceImpl implements PrivateService {
             throw new RequestAlreadyExistsException("Pizdec");
         }
     }
+
+    @Override
+    public List<ParticipationRequestDto> getParticipationRequestsOfUser(Long userId, Long eventId) {
+
+        return null;
+    }
 }

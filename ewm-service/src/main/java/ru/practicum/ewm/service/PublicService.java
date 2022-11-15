@@ -19,5 +19,6 @@ public interface PublicService {
 
     List<CompilationDto> getCompilationsByParams(Boolean pinned, PageRequest pageRequest);
 
-    List<EventShortDto> getEvents(String text, List<Long> categories, Boolean paid, String rangeStart, String rangeEnd, Boolean onlyAvailable, String sort, PageRequest pageRequest);
+    List<EventShortDto> getEvents(String text, List<Long> categories, Boolean paid,
+                                  String rangeStart, String rangeEnd, Boolean onlyAvailable, PageRequest pageRequest);
 }

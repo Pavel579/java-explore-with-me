@@ -3,7 +3,9 @@ package ru.practicum.ewm.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.ewm.dto.category.CategoryDto;
@@ -29,8 +31,10 @@ import ru.practicum.ewm.storage.CompilationRepository;
 import ru.practicum.ewm.storage.EventRepository;
 import ru.practicum.ewm.storage.UserRepository;
 
+import javax.persistence.criteria.Predicate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 import static ru.practicum.ewm.utils.Utils.getNullPropertyNames;
@@ -130,9 +134,39 @@ public class AdminServiceImpl implements AdminService {
                                                 String rangeStart, String rangeEnd,
                                                 PageRequest pageRequest) {
         DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        LocalDateTime start = LocalDateTime.parse(rangeStart, format);
-        LocalDateTime end = LocalDateTime.parse(rangeEnd, format);
-        List<Event> events = eventRepository.findAllEventsByParams(users, states, categories, start, end, pageRequest);
+        LocalDateTime start;
+        LocalDateTime end;
+        if (rangeStart == null){
+            start = LocalDateTime.MIN;
+        }else {
+            start = LocalDateTime.parse(rangeStart, format);
+        }
+        if (rangeEnd == null) {
+            end = LocalDateTime.MAX;
+        }else {
+            end = LocalDateTime.parse(rangeEnd, format);
+        }
+
+        Specification<Event> specification = (root, query, builder) -> {
+            List<Predicate> predicates = new ArrayList<>();
+
+            if (users != null && !users.isEmpty()) {
+                predicates.add(builder.and(root.get("initiator").in(users)));
+            }
+            if (states != null && !states.isEmpty()) {
+                predicates.add(builder.and(root.get("state").in(states)));
+            }
+            if (categories != null && !categories.isEmpty()) {
+                predicates.add(builder.and(root.get("category").in(categories)));
+            }
+            predicates.add(builder.greaterThan(root.get("eventDate"), start));
+            predicates.add(builder.lessThan(root.get("eventDate"), end));
+
+            return builder.and(predicates.toArray(new Predicate[0]));
+        };
+
+        Page<Event> events = eventRepository.findAll(specification, pageRequest);
+
         return eventMapper.mapToListEventFullDto(events);
     }
 

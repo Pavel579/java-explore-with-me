@@ -3,7 +3,7 @@ package ru.practicum.ewm.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import ru.practicum.ewm.dto.category.CategoryDto;
 import ru.practicum.ewm.dto.compilation.CompilationDto;
@@ -16,15 +16,14 @@ import ru.practicum.ewm.mapper.EventMapper;
 import ru.practicum.ewm.model.Category;
 import ru.practicum.ewm.model.Compilation;
 import ru.practicum.ewm.model.Event;
+import ru.practicum.ewm.model.EventState;
 import ru.practicum.ewm.storage.CategoryRepository;
 import ru.practicum.ewm.storage.CompilationRepository;
 import ru.practicum.ewm.storage.EventRepository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
+import javax.persistence.criteria.Predicate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -86,26 +85,47 @@ public class PublicServiceImpl implements PublicService {
     @Override
     public List<EventShortDto> getEvents(String text, List<Long> categories,
                                          Boolean paid, String rangeStart, String rangeEnd,
-                                         Boolean onlyAvailable, String sort, PageRequest pageRequest) {
-
+                                         Boolean onlyAvailable, PageRequest pageRequest) {
         DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        LocalDateTime start = LocalDateTime.parse(rangeStart, format);
-        LocalDateTime end = LocalDateTime.parse(rangeEnd, format);
-        Sort sort1 = null;
-        switch (sort) {
-            case "EVENT_DATE":
-                sort1 = Sort.by(Sort.Direction.DESC, "eventDate");
-                break;
-            case "VIEWS":
-                sort1 = Sort.by(Sort.Direction.DESC, "views");
-                break;
+        LocalDateTime start;
+        LocalDateTime end;
+        if (rangeStart == null) {
+            start = LocalDateTime.MIN;
+        } else {
+            start = LocalDateTime.parse(rangeStart, format);
         }
-        CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
-        CriteriaQuery<Event> criteriaQuery = criteriaBuilder.createQuery(Event.class);
-        Root<Event> root = criteriaQuery.from(Event.class);
-        criteriaQuery.select(root);
+        if (rangeEnd == null) {
+            end = LocalDateTime.MAX;
+        } else {
+            end = LocalDateTime.parse(rangeEnd, format);
+        }
 
+        Specification<Event> specification = (root, query, builder) -> {
+            List<Predicate> predicates = new ArrayList<>();
 
-        return null;
+            predicates.add(builder.equal(root.get("state"), EventState.PUBLISHED));
+            if (text != null && !text.isEmpty()) {
+                predicates.add(builder.or(builder.like(builder.lower(root.get("annotation")), "%" + text.toLowerCase() + "%"),
+                        builder.like(builder.lower(root.get("description")), "%" + text.toLowerCase() + "%")));
+            }
+            if (categories != null) {
+                predicates.add(builder.and(root.get("category").in(categories)));
+            }
+            if (paid != null) {
+                predicates.add(builder.equal(root.get("paid"), paid));
+            }
+            predicates.add(builder.greaterThan(root.get("eventDate"), start));
+            predicates.add(builder.lessThan(root.get("eventDate"), end));
+            if (onlyAvailable) {
+                predicates.add(builder.or(builder.equal(root.get("participantLimit"), 0),
+                        builder.and(builder.notEqual(root.get("participantLimit"), 0),
+                                builder.greaterThan(root.get("participantLimit"), root.get("confirmedRequests")))));
+            }
+
+            return builder.and(predicates.toArray(new Predicate[0]));
+        };
+        Page<Event> events = eventRepository.findAll(specification, pageRequest);
+
+        return eventMapper.mapToListEventShortDto(events);
     }
 }

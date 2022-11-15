@@ -1,6 +1,7 @@
 package ru.practicum.ewm.mapper;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 import ru.practicum.ewm.dto.event.EventFullDto;
 import ru.practicum.ewm.dto.event.EventShortDto;
@@ -81,7 +82,15 @@ public class EventMapper {
         return eventList.stream().map(this::mapToEventShortDto).collect(Collectors.toList());
     }
 
+    public List<EventShortDto> mapToListEventShortDto(Page<Event> eventList) {
+        return eventList.stream().map(this::mapToEventShortDto).collect(Collectors.toList());
+    }
+
     public List<EventFullDto> mapToListEventFullDto(List<Event> events) {
+        return events.stream().map(this::mapToEventFullDto).collect(Collectors.toList());
+    }
+
+    public List<EventFullDto> mapToListEventFullDto(Page<Event> events) {
         return events.stream().map(this::mapToEventFullDto).collect(Collectors.toList());
     }
 }

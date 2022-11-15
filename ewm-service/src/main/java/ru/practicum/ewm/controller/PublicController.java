@@ -2,6 +2,7 @@ package ru.practicum.ewm.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -68,9 +69,21 @@ public class PublicController {
             @Positive @RequestParam(name = "size", required = false, defaultValue = "10") Integer size
     ) {
         int page = from / size;
-        final PageRequest pageRequest = PageRequest.of(page, size);
 
-        return publicService.getEvents(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, pageRequest);
+        Sort sorting = null;
+        switch (sort) {
+            case "EVENT_DATE":
+                sorting = Sort.by(Sort.Direction.DESC, "eventDate");
+                break;
+            case "VIEWS":
+                sorting = Sort.by(Sort.Direction.DESC, "views");
+                break;
+            default:
+                sorting = Sort.by(Sort.Direction.ASC, "id");
+        }
+        final PageRequest pageRequest = PageRequest.of(page, size, sorting);
+
+        return publicService.getEvents(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, pageRequest);
     }
 
 
