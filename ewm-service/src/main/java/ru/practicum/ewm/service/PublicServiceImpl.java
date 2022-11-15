@@ -16,7 +16,6 @@ import ru.practicum.ewm.mapper.EventMapper;
 import ru.practicum.ewm.model.Category;
 import ru.practicum.ewm.model.Compilation;
 import ru.practicum.ewm.model.Event;
-import ru.practicum.ewm.model.EventState;
 import ru.practicum.ewm.storage.CategoryRepository;
 import ru.practicum.ewm.storage.CompilationRepository;
 import ru.practicum.ewm.storage.EventRepository;
@@ -105,9 +104,6 @@ public class PublicServiceImpl implements PublicService {
         CriteriaQuery<Event> criteriaQuery = criteriaBuilder.createQuery(Event.class);
         Root<Event> root = criteriaQuery.from(Event.class);
         criteriaQuery.select(root);
-
-
-
 
 
         return null;

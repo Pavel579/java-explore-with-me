@@ -10,12 +10,10 @@ import ru.practicum.ewm.dto.category.CategoryDto;
 import ru.practicum.ewm.dto.compilation.CompilationDto;
 import ru.practicum.ewm.dto.event.EventFullDto;
 import ru.practicum.ewm.dto.event.EventShortDto;
-import ru.practicum.ewm.model.EventState;
 import ru.practicum.ewm.service.PublicService;
 
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController

@@ -107,7 +107,7 @@ public class AdminServiceImpl implements AdminService {
             event.setState(EventState.PUBLISHED);
             eventRepository.save(event);
             return eventMapper.mapToEventFullDto(event);
-        }else {
+        } else {
             throw new NotFoundException("asdfsd");
         }
     }
@@ -116,11 +116,11 @@ public class AdminServiceImpl implements AdminService {
     @Transactional
     public EventFullDto rejectEvent(Long eventId) {
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException("Event not found!"));
-        if (!event.getState().equals(EventState.PUBLISHED)){
+        if (!event.getState().equals(EventState.PUBLISHED)) {
             event.setState(EventState.CANCELED);
             eventRepository.save(event);
             return eventMapper.mapToEventFullDto(event);
-        }else {
+        } else {
             throw new NotFoundException("adsfsdfc");
         }
     }
@@ -132,7 +132,7 @@ public class AdminServiceImpl implements AdminService {
         DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         LocalDateTime start = LocalDateTime.parse(rangeStart, format);
         LocalDateTime end = LocalDateTime.parse(rangeEnd, format);
-        List<Event> events = eventRepository.findAllEventsByParams(users, states, categories, start, end,pageRequest);
+        List<Event> events = eventRepository.findAllEventsByParams(users, states, categories, start, end, pageRequest);
         return eventMapper.mapToListEventFullDto(events);
     }
 

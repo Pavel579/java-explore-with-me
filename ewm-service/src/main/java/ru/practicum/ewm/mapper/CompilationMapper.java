@@ -8,7 +8,6 @@ import ru.practicum.ewm.model.Compilation;
 import ru.practicum.ewm.model.Event;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Component
 public class CompilationMapper {
@@ -18,7 +17,7 @@ public class CompilationMapper {
                 events,
                 newCompilationDto.getPinned(),
                 newCompilationDto.getTitle()
-                );
+        );
     }
 
     public CompilationDto mapToCompilationDto(Compilation compilation, List<EventShortDto> shortEvents) {

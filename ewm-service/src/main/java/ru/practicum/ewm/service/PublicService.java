@@ -5,7 +5,6 @@ import ru.practicum.ewm.dto.category.CategoryDto;
 import ru.practicum.ewm.dto.compilation.CompilationDto;
 import ru.practicum.ewm.dto.event.EventFullDto;
 import ru.practicum.ewm.dto.event.EventShortDto;
-import ru.practicum.ewm.model.EventState;
 
 import java.util.List;
 

@@ -9,7 +9,6 @@ import ru.practicum.ewm.dto.event.EventFullDto;
 import ru.practicum.ewm.dto.user.UserDto;
 import ru.practicum.ewm.model.EventState;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 public interface AdminService {

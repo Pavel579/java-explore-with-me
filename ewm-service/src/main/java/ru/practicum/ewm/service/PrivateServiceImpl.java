@@ -75,7 +75,7 @@ public class PrivateServiceImpl implements PrivateService {
             throw new RequestAlreadyExistsException("Bad request!!");
         }
 
-        Request saveRequest = requestRepository.save(requestMapper.mapToRequest(user,event));
+        Request saveRequest = requestRepository.save(requestMapper.mapToRequest(user, event));
         return requestMapper.mapToParticipationRequestDto(saveRequest);
     }
 
@@ -88,11 +88,11 @@ public class PrivateServiceImpl implements PrivateService {
     @Override
     public ParticipationRequestDto cancelRequest(Long userId, Long requestId) {
         Request request = requestRepository.findById(requestId).orElseThrow(() -> new RequestNotFoundException("Request Not found!"));
-        if (request.getRequester().getId().equals(userId)){
+        if (request.getRequester().getId().equals(userId)) {
             request.setStatus(RequestState.CANCELED);
             requestRepository.save(request);
             return requestMapper.mapToParticipationRequestDto(request);
-        }else {
+        } else {
             throw new RequestAlreadyExistsException("Pizdec");
         }
     }
