@@ -7,13 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import javax.persistence.Column;
-import javax.persistence.ElementCollection;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.util.List;
 
 @Getter
@@ -28,8 +22,12 @@ public class Compilation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @ElementCollection
-    private List<Long> events;
+    @ManyToMany
+    @JoinTable(
+            name = "compilation_events",
+            joinColumns = @JoinColumn(name = "event_id"),
+            inverseJoinColumns = @JoinColumn(name = "compilation_id"))
+    private List<Event> events;
     @Column(name = "pinned")
     private Boolean pinned;
     @Column(name = "title")

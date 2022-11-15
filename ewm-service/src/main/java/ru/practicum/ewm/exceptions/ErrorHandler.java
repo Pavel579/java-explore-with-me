@@ -26,8 +26,8 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler
-    public ResponseEntity<String> handleEventNotFoundException(final EventNotFoundException e) {
-        log.debug("EventNotFoundException");
+    public ResponseEntity<String> handleNotFoundException(final NotFoundException e) {
+        log.debug("NotFoundException");
         return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
     }
 }

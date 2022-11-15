@@ -36,6 +36,7 @@ public class Event {
     private User initiator;
     @Column(name = "description")
     private String description;
+    //@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @Column(name = "event_date", nullable = false)
     private LocalDateTime eventDate;
     @ManyToOne

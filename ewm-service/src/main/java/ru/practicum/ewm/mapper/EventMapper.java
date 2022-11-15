@@ -80,4 +80,8 @@ public class EventMapper {
     public List<EventShortDto> mapToListEventShortDto(List<Event> eventList) {
         return eventList.stream().map(this::mapToEventShortDto).collect(Collectors.toList());
     }
+
+    public List<EventFullDto> mapToListEventFullDto(List<Event> events) {
+        return events.stream().map(this::mapToEventFullDto).collect(Collectors.toList());
+    }
 }
