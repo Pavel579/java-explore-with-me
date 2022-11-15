@@ -136,14 +136,14 @@ public class AdminServiceImpl implements AdminService {
         DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         LocalDateTime start;
         LocalDateTime end;
-        if (rangeStart == null){
+        if (rangeStart == null) {
             start = LocalDateTime.MIN;
-        }else {
+        } else {
             start = LocalDateTime.parse(rangeStart, format);
         }
         if (rangeEnd == null) {
             end = LocalDateTime.MAX;
-        }else {
+        } else {
             end = LocalDateTime.parse(rangeEnd, format);
         }
 
