@@ -4,6 +4,7 @@ import org.springframework.data.domain.PageRequest;
 import ru.practicum.ewm.dto.event.EventFullDto;
 import ru.practicum.ewm.dto.event.EventShortDto;
 import ru.practicum.ewm.dto.event.NewEventDto;
+import ru.practicum.ewm.dto.event.UpdateEventRequestDto;
 import ru.practicum.ewm.dto.request.ParticipationRequestDto;
 
 import java.util.List;
@@ -22,4 +23,12 @@ public interface PrivateService {
     ParticipationRequestDto cancelRequest(Long userId, Long requestId);
 
     List<ParticipationRequestDto> getParticipationRequestsOfUser(Long userId, Long eventId);
+
+    ParticipationRequestDto confirmRequest(Long userId, Long eventId, Long reqId);
+
+    ParticipationRequestDto rejectRequest(Long userId, Long eventId, Long reqId);
+
+    EventFullDto updateEvent(UpdateEventRequestDto updateEventDto, Long userId);
+
+    EventFullDto cancelEvent(Long userId, Long eventId);
 }

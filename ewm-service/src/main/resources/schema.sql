@@ -65,12 +65,12 @@ create table if not exists events
 
 create table if not exists compilation_events
 (
-    event_id       bigint
-        constraint compilation_events_events_id_fk
-            references events,
-    compilation_id bigint
-        constraint compilation_events_compilations_id_fk
-            references compilations,
+    event_id       bigint,
+        --constraint compilation_events_events_id_fk
+          --  references events,
+    compilation_id bigint,
+        --constraint compilation_events_compilations_id_fk
+          --  references compilations,
     primary key (event_id, compilation_id)
 );
 

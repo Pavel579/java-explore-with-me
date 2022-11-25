@@ -38,19 +38,26 @@ public class AdminController {
             @RequestParam(required = false) String rangeStart,
             @RequestParam(required = false) String rangeEnd,
             @PositiveOrZero @RequestParam(name = "from", required = false, defaultValue = "0") Integer from,
-            @Positive @RequestParam(name = "size", required = false, defaultValue = "10") Integer size
-    ) {
-        int page = from / size;
-        final PageRequest pageRequest = PageRequest.of(page, size);
-        List<EventState> eventStates = new ArrayList<>();
-        for (String s : states) {
-            eventStates.add(EventState.valueOf(s));
+            @Positive @RequestParam(name = "size", required = false, defaultValue = "10") Integer size) {
+        PageRequest pageRequest = null;
+        if (from != null && size != null) {
+            int page = from / size;
+            pageRequest = PageRequest.of(page, size);
         }
+        List<EventState> eventStates = null;
+        if (states != null) {
+            eventStates = new ArrayList<>();
+            for (String s : states) {
+                eventStates.add(EventState.valueOf(s));
+            }
+        }
+        log.debug("get events contr");
         return adminService.getEventsByParams(users, eventStates, categories, rangeStart, rangeEnd, pageRequest);
     }
 
     @PutMapping("/events/{eventId}")
-    public EventFullDto updateEvent(@PathVariable Long eventId, @RequestBody AdminUpdateEventRequestDto adminUpdateEventRequestDto) {
+    public EventFullDto updateEvent(@PathVariable Long eventId,
+                                    @RequestBody AdminUpdateEventRequestDto adminUpdateEventRequestDto) {
         return adminService.updateEvent(eventId, adminUpdateEventRequestDto);
     }
 
@@ -87,7 +94,7 @@ public class AdminController {
      */
     @PostMapping("/users")
     public UserDto createUser(@Validated(Create.class) @RequestBody UserDto userDto) {
-        log.info("vcxbcxvb");
+        log.debug("Create user contr");
         return adminService.createUser(userDto);
     }
 
@@ -138,6 +145,4 @@ public class AdminController {
     public void setPinnedCompilation(@PathVariable Long compId) {
         adminService.setPinnedCompilation(compId);
     }
-
-
 }

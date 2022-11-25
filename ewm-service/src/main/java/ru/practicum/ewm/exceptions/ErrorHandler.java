@@ -1,6 +1,7 @@
 package ru.practicum.ewm.exceptions;
 
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -30,4 +31,24 @@ public class ErrorHandler {
         log.debug("NotFoundException");
         return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
     }
+
+    @ExceptionHandler
+    public ResponseEntity<String> handleValidationException(final ValidationException e) {
+        log.debug("ValidationException");
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<ErrorApi> handleConstraintViolationException(final ConstraintViolationException e) {
+        log.debug("ConstraintViolationException");
+        errorApi.setErrors(e.getStackTrace());
+        errorApi.setReason("For the requested operation the conditions are not met.");
+        errorApi.setMessage(e.getMessage());
+        errorApi.setStatus("CONFLICT");
+        errorApi.setTimestamp(LocalDateTime.now());
+        return new ResponseEntity<>(errorApi, HttpStatus.CONFLICT);
+    }
+
+
+
 }

@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.ewm.dto.event.EventFullDto;
 import ru.practicum.ewm.dto.event.EventShortDto;
 import ru.practicum.ewm.dto.event.NewEventDto;
+import ru.practicum.ewm.dto.event.UpdateEventRequestDto;
 import ru.practicum.ewm.dto.request.ParticipationRequestDto;
 import ru.practicum.ewm.service.PrivateService;
 import ru.practicum.ewm.utils.Create;
@@ -31,9 +32,16 @@ public class PrivateController {
     private final PrivateService privateService;
 
     @PostMapping("/{userId}/events")
-    public EventFullDto createEvent(@Validated(Create.class) @RequestBody NewEventDto newEventDto, @PathVariable Long userId) {
-        log.info("log event");
+    public EventFullDto createEvent(@Validated(Create.class) @RequestBody NewEventDto newEventDto,
+                                    @PathVariable Long userId) {
+        log.debug("Create event contr");
         return privateService.createEvent(userId, newEventDto);
+    }
+
+    @PatchMapping("/{userId}/events")
+    public EventFullDto updateEvent(@Validated @RequestBody UpdateEventRequestDto updateEventDto,
+                                    @PathVariable Long userId) {
+        return privateService.updateEvent(updateEventDto, userId);
     }
 
     @GetMapping("/{userId}/events")
@@ -41,23 +49,42 @@ public class PrivateController {
             @PathVariable Long userId,
             @PositiveOrZero @RequestParam(name = "from", required = false, defaultValue = "0") Integer from,
             @Positive @RequestParam(name = "size", required = false, defaultValue = "10") Integer size) {
-        int page = from / size;
-        final PageRequest pageRequest = PageRequest.of(page, size);
+        PageRequest pageRequest = null;
+        if (from != null && size != null) {
+            int page = from / size;
+            pageRequest = PageRequest.of(page, size);
+        }
         return privateService.getEventsByUser(userId, pageRequest);
     }
 
     @GetMapping("/{userId}/events/{eventId}")
     public EventFullDto getEventByUserIdAndEventId(@PathVariable Long userId, @PathVariable Long eventId) {
-        log.info("get event by id contr");
+        log.debug("get event by id contr");
         return privateService.getEventByUserIdAndEventId(userId, eventId);
     }
 
+    @PatchMapping("/{userId}/events/{eventId}")
+    public EventFullDto cancelEvent(@PathVariable Long userId, @PathVariable Long eventId) {
+        return privateService.cancelEvent(userId, eventId);
+    }
+
     @GetMapping("/{userId}/events/{eventId}/requests")
-    public List<ParticipationRequestDto> getParticipationRequestsOfUser(@PathVariable Long userId, @PathVariable Long eventId) {
+    public List<ParticipationRequestDto> getParticipationRequestsOfUser(@PathVariable Long userId,
+                                                                        @PathVariable Long eventId) {
         return privateService.getParticipationRequestsOfUser(userId, eventId);
     }
 
+    @PatchMapping("/{userId}/events/{eventId}/requests/{reqId}/confirm")
+    public ParticipationRequestDto confirmRequest(@PathVariable Long userId, @PathVariable Long eventId,
+                                                  @PathVariable Long reqId) {
+        return privateService.confirmRequest(userId, eventId, reqId);
+    }
 
+    @PatchMapping("/{userId}/events/{eventId}/requests/{reqId}/reject")
+    public ParticipationRequestDto rejectRequest(@PathVariable Long userId,
+                                                 @PathVariable Long eventId, @PathVariable Long reqId) {
+        return privateService.rejectRequest(userId, eventId, reqId);
+    }
 
 
     @PostMapping("/{userId}/requests")

@@ -21,8 +21,6 @@ import ru.practicum.ewm.storage.CategoryRepository;
 import ru.practicum.ewm.storage.CompilationRepository;
 import ru.practicum.ewm.storage.EventRepository;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import javax.persistence.criteria.Predicate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -38,8 +36,6 @@ public class PublicServiceImpl implements PublicService {
     private final CategoryMapper categoryMapper;
     private final CompilationMapper compilationMapper;
     private final EventMapper eventMapper;
-    @PersistenceContext
-    private EntityManager em;
 
     @Override
     public List<CategoryDto> getCategories(PageRequest pageRequest) {
@@ -50,12 +46,13 @@ public class PublicServiceImpl implements PublicService {
     @Override
     public CategoryDto getCategoryById(Long catId) {
         return categoryMapper.mapToCategoryDto(categoryRepository.findById(catId)
-                .orElseThrow(() -> new NotFoundException("Cat not found")));
+                .orElseThrow(() -> new NotFoundException("Category not found")));
     }
 
     @Override
     public CompilationDto getCompilationById(Long compId) {
-        Compilation compilation = compilationRepository.findById(compId).orElseThrow(() -> new NotFoundException("Compilation not found!"));
+        Compilation compilation = compilationRepository.findById(compId)
+                .orElseThrow(() -> new NotFoundException("Compilation not found!"));
         List<Long> eventsIds = new ArrayList<>();
         for (Event e : compilation.getEvents()) {
             eventsIds.add(e.getId());
@@ -79,6 +76,7 @@ public class PublicServiceImpl implements PublicService {
     @Override
     public EventFullDto getEventById(Long id) {
         Event event = eventRepository.findById(id).orElseThrow(() -> new NotFoundException("Event not found!"));
+        event.setViews(event.getViews() + 1);
         return eventMapper.mapToEventFullDto(event);
     }
 
@@ -90,12 +88,12 @@ public class PublicServiceImpl implements PublicService {
         LocalDateTime start;
         LocalDateTime end;
         if (rangeStart == null) {
-            start = LocalDateTime.MIN;
+            start = LocalDateTime.of(1970, 12, 2, 0, 0);
         } else {
             start = LocalDateTime.parse(rangeStart, format);
         }
         if (rangeEnd == null) {
-            end = LocalDateTime.MAX;
+            end = LocalDateTime.of(3000, 12, 2, 0, 0);
         } else {
             end = LocalDateTime.parse(rangeEnd, format);
         }
@@ -116,7 +114,7 @@ public class PublicServiceImpl implements PublicService {
             }
             predicates.add(builder.greaterThan(root.get("eventDate"), start));
             predicates.add(builder.lessThan(root.get("eventDate"), end));
-            if (onlyAvailable) {
+            if (onlyAvailable != null) {
                 predicates.add(builder.or(builder.equal(root.get("participantLimit"), 0),
                         builder.and(builder.notEqual(root.get("participantLimit"), 0),
                                 builder.greaterThan(root.get("participantLimit"), root.get("confirmedRequests")))));

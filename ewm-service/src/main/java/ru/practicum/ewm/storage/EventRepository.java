@@ -16,16 +16,12 @@ public interface EventRepository extends JpaRepository<Event, Long> {
 
     List<Event> findAllByInitiatorId(Long userId, Pageable pageable);
 
+    List<Event> findAllByInitiatorId(Long userId);
+
     @Query("select e from Event e where e.id = ?2 and e.initiator.id = ?1")
     Event findAllByInitiatorIdAndId(Long userId, Long eventId);
 
     List<Event> findAllByIdIn(List<Long> events);
-
-    /*@Query("select e from Event e where (e.id is null or e.initiator.id = :users) and (e.state is null or e.state = :states) and " +
-            "(e.category.id is null or e.category.id = :categories) and (e.eventDate is null or e.eventDate > :rangeStart) and " +
-            "(e.eventDate is null or e.eventDate < :rangeEnd)")
-    List<Event> findAllEventsByParams(List<Long> users, List<EventState> states, List<Long> categories,
-                                      LocalDateTime rangeStart, LocalDateTime rangeEnd, PageRequest pageRequest);*/
 
     Page<Event> findAll(Specification<Event> specification, Pageable pageable);
 }
