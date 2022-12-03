@@ -1,10 +1,8 @@
 package ru.practicum.ewm.storage;
 
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
-import ru.practicum.ewm.model.Event;
 import ru.practicum.ewm.model.Request;
 import ru.practicum.ewm.model.RequestState;
 
@@ -18,12 +16,10 @@ public interface RequestRepository extends JpaRepository<Request, Long> {
 
     List<Request> findAllByRequesterId(Long userId);
 
-    List<Request> findAll(Specification<Event> specification);
-
     List<Request> findAllByEventIdAndStatus(Long eventId, RequestState pending);
 
 
-    @Query("SELECT COUNT (r.event) from Request r " +
+    @Query("SELECT COUNT(r.event) from Request r " +
             "WHERE r.event.id = ?1 AND r.status = ?2")
     Long findConfirmedRequests(Long eventId, RequestState confirmed);
 
@@ -32,4 +28,6 @@ public interface RequestRepository extends JpaRepository<Request, Long> {
 
     @Query("SELECT r from Request r where r.id = ?1 and r.requester.id = ?2")
     Optional<Request> findByIdAndRequesterId(Long requestId, Long userId);
+
+    Optional<Request> findByIdAndEventIdAndEventInitiatorId(Long reqId, Long eventId, Long userId);
 }

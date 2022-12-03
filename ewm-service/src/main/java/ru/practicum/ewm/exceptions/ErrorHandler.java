@@ -1,7 +1,6 @@
 package ru.practicum.ewm.exceptions;
 
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,12 +17,19 @@ public class ErrorHandler {
     private final ErrorApi errorApi = new ErrorApi();
 
     @ExceptionHandler
+    public ResponseEntity<String> handleOtherException(final Throwable e) {
+        log.debug("OtherException");
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+
+    @ExceptionHandler
     public ResponseEntity<ErrorApi> handleMethodArgumentNotValidException(final MethodArgumentNotValidException e) {
         log.debug("MethodArgumentNotValidException - log");
         errorApi.setErrors(e.getStackTrace());
         errorApi.setReason("For the requested operation the conditions are not met.");
         errorApi.setMessage(e.getMessage());
-        errorApi.setStatus("FORBIDDEN");
+        errorApi.setStatus("BAD_REQUEST");
         errorApi.setTimestamp(LocalDateTime.now());
         return new ResponseEntity<>(errorApi, HttpStatus.BAD_REQUEST);
     }
@@ -52,39 +58,19 @@ public class ErrorHandler {
         errorApi.setErrors(e.getStackTrace());
         errorApi.setReason("For the requested operation the conditions are not met.");
         errorApi.setMessage(e.getMessage());
-        errorApi.setStatus("BAD_REQUEST");
+        errorApi.setStatus("CONFLICT");
         errorApi.setTimestamp(LocalDateTime.now());
         return new ResponseEntity<>(errorApi, HttpStatus.CONFLICT);
     }
 
-
-
-
-   /* @ExceptionHandler
-    public ResponseEntity<ErrorApi> handleConstraintViolationException(final ConstraintViolationException e) {
-        log.debug("ConstraintViolationException");
+    @ExceptionHandler
+    public ResponseEntity<ErrorApi> handleMissingServletRequestParameterException(final MissingServletRequestParameterException e) {
+        log.debug("MissingServletRequestParameterException");
         errorApi.setErrors(e.getStackTrace());
         errorApi.setReason("For the requested operation the conditions are not met.");
         errorApi.setMessage(e.getMessage());
         errorApi.setStatus("BAD_REQUEST");
         errorApi.setTimestamp(LocalDateTime.now());
-        return new ResponseEntity<>(errorApi, HttpStatus.CONFLICT);
-    }*/
-
-    /*@ExceptionHandler
-    public ResponseEntity<String> handleMissingServletRequestParameterException(final MissingServletRequestParameterException e) {
-        log.debug("MissingServletRequestParameterException");
-        return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-    }*/
-
-
-
-    /*@ExceptionHandler
-    public ResponseEntity<String> handleOtherException(final Throwable e) {
-        log.debug("OtherException");
-        return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-    }*/
-
-
-
+        return new ResponseEntity<>(errorApi, HttpStatus.BAD_REQUEST);
+    }
 }

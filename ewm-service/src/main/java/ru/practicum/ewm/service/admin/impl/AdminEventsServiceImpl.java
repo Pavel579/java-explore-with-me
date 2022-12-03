@@ -3,7 +3,6 @@ package ru.practicum.ewm.service.admin.impl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -22,9 +21,9 @@ import ru.practicum.ewm.storage.RequestRepository;
 
 import javax.persistence.criteria.Predicate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static ru.practicum.ewm.utils.Utils.getNullPropertyNames;
 
@@ -37,7 +36,6 @@ public class AdminEventsServiceImpl implements AdminEventsService {
     private final EventRepository eventRepository;
     private final RequestRepository requestRepository;
     private final EventMapper eventMapper;
-    private static final DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     @Override
     @Transactional
@@ -46,7 +44,6 @@ public class AdminEventsServiceImpl implements AdminEventsService {
         if (event.getEventDate().minusHours(1).isAfter(LocalDateTime.now()) && event.getState().equals(EventState.PENDING)) {
             event.setState(EventState.PUBLISHED);
             eventRepository.save(event);
-            //int confirmedRequests = requestRepository.findConfirmedRequests(eventId, RequestState.CONFIRMED);
             Long confirmedRequests = requestRepository.findConfirmedRequests(event.getId(), RequestState.CONFIRMED);
             Long views = hitService.getViewsForEvent(event, false);
             return eventMapper.mapToEventFullDto(event, confirmedRequests, views);
@@ -62,7 +59,6 @@ public class AdminEventsServiceImpl implements AdminEventsService {
         if (!event.getState().equals(EventState.PUBLISHED)) {
             event.setState(EventState.CANCELED);
             eventRepository.save(event);
-            //int confirmedRequests = requestRepository.findConfirmedRequests(eventId, RequestState.CONFIRMED);
             Long confirmedRequests = requestRepository.findConfirmedRequests(event.getId(), RequestState.CONFIRMED);
             Long views = hitService.getViewsForEvent(event, false);
             return eventMapper.mapToEventFullDto(event, confirmedRequests, views);
@@ -73,22 +69,13 @@ public class AdminEventsServiceImpl implements AdminEventsService {
 
     @Override
     public List<EventFullDto> getByParams(List<Long> users, List<EventState> states, List<Long> categories,
-                                          String rangeStart, String rangeEnd,
+                                          LocalDateTime rangeStart, LocalDateTime rangeEnd,
                                           PageRequest pageRequest) {
         log.debug("get events start service");
         LocalDateTime start;
         LocalDateTime end;
-        if (rangeStart == null) {
-            start = LocalDateTime.of(1970, 12, 2, 0, 0);
-            log.debug("rage start null");
-        } else {
-            start = LocalDateTime.parse(rangeStart, format);
-        }
-        if (rangeEnd == null) {
-            end = LocalDateTime.of(3000, 12, 2, 0, 0);
-        } else {
-            end = LocalDateTime.parse(rangeEnd, format);
-        }
+        start = Objects.requireNonNullElseGet(rangeStart, () -> LocalDateTime.of(1970, 12, 2, 0, 0));
+        end = Objects.requireNonNullElseGet(rangeEnd, () -> LocalDateTime.of(3000, 12, 2, 0, 0));
 
         Specification<Event> specification = (root, query, builder) -> {
             List<Predicate> predicates = new ArrayList<>();
@@ -115,12 +102,12 @@ public class AdminEventsServiceImpl implements AdminEventsService {
         return eventMapper.mapToListEventFullDto(events);
     }
 
+
     @Override
     @Transactional
     public EventFullDto update(Long eventId, AdminUpdateEventRequestDto adminUpdateEventRequestDto) {
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException("Event not found!"));
         BeanUtils.copyProperties(adminUpdateEventRequestDto, event, getNullPropertyNames(adminUpdateEventRequestDto));
-        //int confirmedRequests = requestRepository.findConfirmedRequests(eventId, RequestState.CONFIRMED);
         Long confirmedRequests = requestRepository.findConfirmedRequests(event.getId(), RequestState.CONFIRMED);
         Long views = hitService.getViewsForEvent(event, false);
         return eventMapper.mapToEventFullDto(event, confirmedRequests, views);

@@ -6,12 +6,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.Hibernate;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 @Getter
@@ -32,14 +29,11 @@ public class Event {
     private Category category;
     @Column(name = "created_on")
     private LocalDateTime createdOn;
-    //@Transient
-    //private Long confirmedRequests = 0L;
     @ManyToOne
     @JoinColumn(name = "initiator_id")
     private User initiator;
     @Column(name = "description")
     private String description;
-    //@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @Column(name = "event_date", nullable = false)
     private LocalDateTime eventDate;
     @ManyToOne
@@ -58,10 +52,6 @@ public class Event {
     private EventState state;
     @Column(name = "title", nullable = false)
     private String title;
-    //private Integer views;
-    /*@OneToMany
-    @JoinColumn(name = "event_id")
-    private final List<Request> requests = new ArrayList<>();*/
 
     @Override
     public boolean equals(Object o) {

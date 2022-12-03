@@ -43,7 +43,6 @@ public class PrivateRequestsServiceImpl implements PrivateRequestsService {
                 || (event.getParticipantLimit() > 0 && event.getParticipantLimit() - confirmedRequests <= 0)) {
             throw new RequestAlreadyExistsException("Bad request!!");
         }
-        //event.setConfirmedRequests(confirmedRequests);
         Request saveRequest = requestRepository.save(requestMapper.mapToRequest(user, event));
         return requestMapper.mapToParticipationRequestDto(saveRequest);
     }
@@ -60,13 +59,6 @@ public class PrivateRequestsServiceImpl implements PrivateRequestsService {
         Request request = requestRepository.findByIdAndRequesterId(requestId, userId)
                 .orElseThrow(() -> new NotFoundException("Request Not found!"));
         request.setStatus(RequestState.CANCELED);
-        /*if (request.getRequester().getId().equals(userId)) {
-            request.setStatus(RequestState.CANCELED);
-            //requestRepository.save(request);
-            return requestMapper.mapToParticipationRequestDto(request);
-        } else {
-            throw new RequestAlreadyExistsException("Can't cancel request");
-        }*/
         return requestMapper.mapToParticipationRequestDto(request);
     }
 }

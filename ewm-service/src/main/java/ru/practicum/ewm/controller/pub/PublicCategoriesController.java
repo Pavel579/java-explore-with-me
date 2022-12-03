@@ -30,7 +30,6 @@ public class PublicCategoriesController {
             @Positive @RequestParam(name = "size", defaultValue = "10") Integer size) {
         int page = from / size;
         PageRequest pageRequest = PageRequest.of(page, size);
-
         return publicCategoriesService.getAll(pageRequest);
     }
 

@@ -35,8 +35,8 @@ public class NewEventDto {
     private Location location;
     private boolean paid;
     @PositiveOrZero
-    private Integer participantLimit;
-    private Boolean requestModeration;
+    private int participantLimit;
+    private boolean requestModeration;
     @NotBlank(groups = {Create.class})
     @Size(max = 120, min = 3)
     private String title;

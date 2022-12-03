@@ -11,5 +11,6 @@ public interface HitService {
     EndpointHit sendHits(HttpServletRequest request);
 
     Long getViewsForEvent(Event event, Boolean unique);
+
     Map<Long, Long> getViewsForEvents(List<Event> event, Boolean unique);
 }

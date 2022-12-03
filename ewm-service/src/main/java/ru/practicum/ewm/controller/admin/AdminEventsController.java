@@ -3,6 +3,7 @@ package ru.practicum.ewm.controller.admin;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -17,8 +18,10 @@ import ru.practicum.ewm.dto.event.EventFullDto;
 import ru.practicum.ewm.model.EventState;
 import ru.practicum.ewm.service.admin.AdminEventsService;
 
+import javax.validation.constraints.FutureOrPresent;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -35,8 +38,8 @@ public class AdminEventsController {
             @RequestParam(required = false) List<Long> users,
             @RequestParam(required = false) List<String> states,
             @RequestParam(required = false) List<Long> categories,
-            @RequestParam(required = false) String rangeStart,
-            @RequestParam(required = false) String rangeEnd,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime rangeStart,
+            @RequestParam(required = false) @FutureOrPresent @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime rangeEnd,
             @PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from,
             @Positive @RequestParam(name = "size", defaultValue = "10") Integer size) {
         int page = from / size;
@@ -45,11 +48,6 @@ public class AdminEventsController {
         List<EventState> eventStates = null;
         if (states != null) {
             eventStates = states.stream().map(EventState::valueOf).collect(Collectors.toList());
-
-            /*eventStates = new ArrayList<>();
-            for (String s : states) {
-                eventStates.add(EventState.valueOf(s));
-            }*/
         }
         log.debug("get events contr");
         return adminEventsService.getByParams(users, eventStates, categories, rangeStart, rangeEnd, pageRequest);

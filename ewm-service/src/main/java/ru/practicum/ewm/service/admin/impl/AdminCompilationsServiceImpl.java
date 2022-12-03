@@ -16,7 +16,9 @@ import ru.practicum.ewm.service.admin.AdminCompilationsService;
 import ru.practicum.ewm.storage.CompilationRepository;
 import ru.practicum.ewm.storage.EventRepository;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -31,10 +33,10 @@ public class AdminCompilationsServiceImpl implements AdminCompilationsService {
     @Override
     @Transactional
     public CompilationDto create(NewCompilationDto newCompilationDto) {
-        List<Event> events = eventRepository.findAllByIdIn(newCompilationDto.getEvents());
+        Set<Event> events = eventRepository.findAllByIdIn(newCompilationDto.getEvents());
         Compilation compilation = compilationMapper.mapToCompilation(newCompilationDto, events);
         compilationRepository.save(compilation);
-        List<EventShortDto> shortEvents = eventMapper.mapToListEventShortDto(events);
+        List<EventShortDto> shortEvents = eventMapper.mapToListEventShortDto(new ArrayList<>(events));
         return compilationMapper.mapToCompilationDto(compilation, shortEvents);
     }
 
@@ -49,7 +51,7 @@ public class AdminCompilationsServiceImpl implements AdminCompilationsService {
     public void deleteEventFromCompilation(Long compId, Long eventId) {
         Compilation compilation = compilationRepository.findById(compId)
                 .orElseThrow(() -> new NotFoundException("Compilation not found!"));
-        List<Event> events = compilation.getEvents();
+        Set<Event> events = compilation.getEvents();
         events.removeIf(e -> e.getId().equals(eventId));
         compilationRepository.save(compilation);
     }

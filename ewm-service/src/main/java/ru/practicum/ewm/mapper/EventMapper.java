@@ -1,13 +1,10 @@
 package ru.practicum.ewm.mapper;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
-import ru.practicum.ewm.client.StatsClient;
 import ru.practicum.ewm.dto.event.EventFullDto;
 import ru.practicum.ewm.dto.event.EventShortDto;
 import ru.practicum.ewm.dto.event.NewEventDto;
-import ru.practicum.ewm.dto.stats.ViewStatsDto;
 import ru.practicum.ewm.model.Category;
 import ru.practicum.ewm.model.Event;
 import ru.practicum.ewm.model.EventState;
@@ -15,9 +12,7 @@ import ru.practicum.ewm.model.Location;
 import ru.practicum.ewm.model.RequestState;
 import ru.practicum.ewm.model.User;
 import ru.practicum.ewm.service.hits.HitService;
-import ru.practicum.ewm.service.pub.PublicEventsService;
 import ru.practicum.ewm.storage.EventRepository;
-import ru.practicum.ewm.storage.RequestRepository;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -28,9 +23,7 @@ import java.util.stream.Collectors;
 @Component
 @RequiredArgsConstructor
 public class EventMapper {
-    //private final PublicEventsService publicEventsService;
     private final CategoryMapper categoryMapper;
-    private final RequestRepository requestRepository;
     private final EventRepository eventRepository;
     private final UserMapper userMapper;
     private final HitService hitService;
@@ -69,7 +62,7 @@ public class EventMapper {
                 newEventDto.isPaid(),
                 newEventDto.getParticipantLimit(),
                 null,
-                newEventDto.getRequestModeration(),
+                newEventDto.isRequestModeration(),
                 EventState.PENDING,
                 newEventDto.getTitle()
         );
@@ -92,25 +85,12 @@ public class EventMapper {
     public List<EventShortDto> mapToListEventShortDto(List<Event> eventList) {
         Map<Long, Long> confirmedRequests = getConfirmedRequests(eventList);
         return eventList.stream().map(event -> this.mapToEventShortDto(event, confirmedRequests.get(event.getId()))).collect(Collectors.toList());
-        //return eventList.stream().map(this::mapToEventShortDto).collect(Collectors.toList());
     }
-
-    /*public List<EventShortDto> mapToListEventShortDto(Page<Event> eventList) {
-        return eventList.stream().map(this::mapToEventShortDto).collect(Collectors.toList());
-    }*/
 
     public List<EventFullDto> mapToListEventFullDto(List<Event> eventList) {
         Map<Long, Long> confirmedRequests = getConfirmedRequests(eventList);
         Map<Long, Long> views = hitService.getViewsForEvents(eventList, false);
-        /*return events.stream()
-                .map(event -> EventMapper.toEventShortDto(event,
-                        confirmedRequests.get(event.getId()),
-                        views.get(event.getId())))
-                .collect(Collectors.toList());*/
         return eventList.stream().map(event -> this.mapToEventFullDto(event, confirmedRequests.get(event.getId()), views.get(event.getId()))).collect(Collectors.toList());
-
-
-        //return events.stream().map(this::mapToEventFullDto).collect(Collectors.toList());
     }
 
     public Map<Long, Long> getConfirmedRequests(List<Event> events) {
@@ -121,6 +101,4 @@ public class EventMapper {
         }
         return confirmedRequests;
     }
-
-
 }

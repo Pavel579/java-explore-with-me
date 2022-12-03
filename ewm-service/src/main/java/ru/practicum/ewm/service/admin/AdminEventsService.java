@@ -5,6 +5,7 @@ import ru.practicum.ewm.dto.event.AdminUpdateEventRequestDto;
 import ru.practicum.ewm.dto.event.EventFullDto;
 import ru.practicum.ewm.model.EventState;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface AdminEventsService {
@@ -13,8 +14,8 @@ public interface AdminEventsService {
     EventFullDto reject(Long eventId);
 
     List<EventFullDto> getByParams(List<Long> users, List<EventState> states,
-                                   List<Long> categories, String rangeStart,
-                                   String rangeEnd, PageRequest pageRequest);
+                                   List<Long> categories, LocalDateTime rangeStart,
+                                   LocalDateTime rangeEnd, PageRequest pageRequest);
 
     EventFullDto update(Long eventId, AdminUpdateEventRequestDto adminUpdateEventRequestDto);
 }

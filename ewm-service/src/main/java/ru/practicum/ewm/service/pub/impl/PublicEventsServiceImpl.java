@@ -1,7 +1,6 @@
 package ru.practicum.ewm.service.pub.impl;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -18,19 +17,14 @@ import ru.practicum.ewm.service.pub.PublicEventsService;
 import ru.practicum.ewm.storage.EventRepository;
 import ru.practicum.ewm.storage.RequestRepository;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import javax.persistence.criteria.Join;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.persistence.criteria.Subquery;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -39,14 +33,10 @@ public class PublicEventsServiceImpl implements PublicEventsService {
     private final EventRepository eventRepository;
     private final RequestRepository requestRepository;
     private final EventMapper eventMapper;
-    @PersistenceContext
-    private EntityManager entityManager;
 
     @Override
     public EventFullDto getById(Long id) {
         Event event = eventRepository.findById(id).orElseThrow(() -> new NotFoundException("Event not found!"));
-        //event.setViews(event.getViews() + 1);
-        //int confirmedRequests = requestRepository.findConfirmedRequests(event.getId(), RequestState.CONFIRMED);
         Long confirmedRequests = requestRepository.findConfirmedRequests(event.getId(), RequestState.CONFIRMED);
         Long views = hitService.getViewsForEvent(event, false);
         return eventMapper.mapToEventFullDto(event, confirmedRequests, views);
@@ -95,14 +85,4 @@ public class PublicEventsServiceImpl implements PublicEventsService {
 
         return eventMapper.mapToListEventShortDto(events);
     }
-
-    /*@Override
-    public Map<Long, Long> getConfirmedRequests(List<Event> events) {
-        Map<Long, Long> confirmedRequests = new HashMap<>();
-        List<Long> eventsIdsList = events.stream().map(Event::getId).collect(Collectors.toList());
-        for (Long[] counts : eventRepository.countAllConfirmedRequests(RequestState.CONFIRMED.toString(), eventsIdsList)) {
-            confirmedRequests.put(counts[0], counts[1]);
-        }
-        return confirmedRequests;
-    }*/
 }

@@ -31,7 +31,7 @@ public class UpdateEventRequestDto {
     private Long eventId;
     private boolean paid;
     @PositiveOrZero
-    private Integer participantLimit;
+    private int participantLimit;
     @Size(max = 120, min = 3)
     @NotBlank
     private String title;

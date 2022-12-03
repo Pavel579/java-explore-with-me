@@ -8,7 +8,6 @@ import ru.practicum.ewm.model.EndpointHit;
 import ru.practicum.ewm.storage.StatsRepository;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
 
@@ -27,9 +26,6 @@ public class StatsServiceImpl implements StatsService {
 
     @Override
     public List<ViewStatsDto> getStats(LocalDateTime start, LocalDateTime end, List<String> uris, Boolean unique) {
-        DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        //LocalDateTime startFrom = LocalDateTime.parse(start, format);
-        //LocalDateTime endBefore = LocalDateTime.parse(end, format);
         if (uris == null || uris.isEmpty()) {
             return Collections.emptyList();
         }

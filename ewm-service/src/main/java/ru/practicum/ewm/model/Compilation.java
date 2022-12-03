@@ -16,7 +16,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
-import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -37,7 +36,7 @@ public class Compilation {
             joinColumns = @JoinColumn(name = "event_id"),
             inverseJoinColumns = @JoinColumn(name = "compilation_id"))
     @ToString.Exclude
-    private List<Event> events;
+    private Set<Event> events;
     @Column(name = "pinned")
     private Boolean pinned;
     @Column(name = "title")

@@ -13,25 +13,13 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Service
-//@RequiredArgsConstructor
 public class StatsClient {
     private final WebClient webClient = WebClient.create();
-    //private final WebClient webClient;
     @Value("${URL_STATS}")
     private String urlStats;
-    @Value("${WEB_CLIENT_URL}")
-    private String urlWebClient;
-
-    /*@Autowired
-    public StatsClient() {
-        webClient = WebClient.builder()
-                .baseUrl(urlStats)
-                .build();
-    }*/
-
 
     public EndpointHit sendHit(EndpointHit endpointHit) {
-        log.info("sendHit client start");
+        log.debug("sendHit client start");
         return webClient
                 .post()
                 .uri(urlStats + "/hit")
@@ -43,18 +31,12 @@ public class StatsClient {
     }
 
     public List<ViewStatsDto> get(String start, String end, List<String> uris, Boolean unique) {
-        log.info("get client start");
+        log.debug("get client start");
         return webClient
                 .get()
-                .uri(urlStats + "/stats?start=" + start + "&end=" + end + "&uris=" + String.join(", ", uris).replace("{", "").replace("}", "") + "&unique=" + unique)
-                /*.uri(uriBuilder -> uriBuilder
-                        .path("/stats/")
-                        //.queryParam("start", start)
-                        //.queryParam("end", end)
-                        //.queryParam("uris", String.join(", ", uris).replace("{", "").replace("}", ""))
-                        //.queryParam("unique", unique)
-                        .build())*/
-                //.header("Content-Type", "application/json")
+                .uri(urlStats + "/stats?start=" + start + "&end=" + end + "&uris=" +
+                        String.join(", ", uris).replace("{", "")
+                                .replace("}", "") + "&unique=" + unique)
                 .retrieve()
                 .bodyToFlux(ViewStatsDto.class)
                 .collect(Collectors.toList())

@@ -11,6 +11,7 @@ import ru.practicum.ewm.model.Event;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -43,9 +44,7 @@ public class HitServiceImpl implements HitService {
 
     @Override
     public Long getViewsForEvent(Event event, Boolean unique) {
-        //String start = URLEncoder.encode(event.getCreatedOn().withNano(0).toString().replace("T", " "), StandardCharsets.UTF_8);
         String start = event.getCreatedOn().withNano(0).toString().replace("T", " ");
-        //String end = URLEncoder.encode(LocalDateTime.now().withNano(0).toString().replace("T", " "), StandardCharsets.UTF_8);
         String end = LocalDateTime.now().withNano(0).toString().replace("T", " ");
         List<ViewStatsDto> views = statsClient.get(start, end,
                 List.of(String.format(eventViewUri, event.getId())),
@@ -62,10 +61,8 @@ public class HitServiceImpl implements HitService {
                 .min(Comparator.comparing(Event::getEventDate));
 
         if (firstEvent.isEmpty()) {
-            return new HashMap<>();
+            return Collections.emptyMap();
         }
-
-        //String start = LocalDateTime.of(1990, 12, 2, 0, 0).withNano(0).toString().replace("T", " ");
         String start = firstEvent.get().getCreatedOn().withNano(0).toString().replace("T", " ");
         String end = LocalDateTime.now().withNano(0).toString().replace("T", " ");
         List<String> uris = events.stream()
@@ -90,7 +87,6 @@ public class HitServiceImpl implements HitService {
                 sb.append(c);
                 found = true;
             } else if (found) {
-                // If we already found a digit before and this char is not a digit, stop looping
                 break;
             }
         }

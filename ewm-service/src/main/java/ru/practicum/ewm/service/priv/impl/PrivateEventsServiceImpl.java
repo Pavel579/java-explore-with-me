@@ -36,7 +36,6 @@ import ru.practicum.ewm.storage.UserRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static ru.practicum.ewm.utils.Utils.getNullPropertyNames;
 
@@ -79,7 +78,6 @@ public class PrivateEventsServiceImpl implements PrivateEventsService {
     @Override
     public EventFullDto getByUserIdAndEventId(Long userId, Long eventId) {
         Event event = eventRepository.findAllByInitiatorIdAndId(userId, eventId);
-        //int confirmedRequests = requestRepository.findConfirmedRequests(eventId, RequestState.CONFIRMED);
         Long confirmedRequests = requestRepository.findConfirmedRequests(eventId, RequestState.CONFIRMED);
         Long views = hitService.getViewsForEvent(event, false);
         return eventMapper.mapToEventFullDto(event, confirmedRequests, views);
@@ -88,9 +86,6 @@ public class PrivateEventsServiceImpl implements PrivateEventsService {
 
     @Override
     public List<ParticipationRequestDto> getParticipationRequestsOfUser(Long userId, Long eventId) {
-        /*List<Event> events = eventRepository.findAllByInitiatorId(userId);
-        List<Request> requests = requestRepository.findAll((root, query, criteriaBuilder) ->
-                root.get("event").in(events.stream().map(Event::getId).collect(Collectors.toList())));*/
         List<Request> requests = requestRepository.findAllByRequesterIdAndEventId(userId, eventId);
         return requestMapper.mapToListParticipationRequestDto(requests);
     }
@@ -98,13 +93,10 @@ public class PrivateEventsServiceImpl implements PrivateEventsService {
     @Override
     @Transactional
     public ParticipationRequestDto confirmRequest(Long userId, Long eventId, Long reqId) {
-        Request request = requestRepository.findById(reqId)
-                .orElseThrow(() -> new NotFoundException("Request not found"));
-        Event event = eventRepository.findById(eventId)
-                .orElseThrow(() -> new NotFoundException("Event not found"));
-        userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User not found!"));
+        Request request = requestRepository.findByIdAndEventIdAndEventInitiatorId(reqId, eventId, userId).orElseThrow(() -> new NotFoundException("No request"));
+        Event event = request.getEvent();
         Long confirmedRequests = requestRepository.findConfirmedRequests(eventId, RequestState.CONFIRMED);
-        if (!userId.equals(event.getInitiator().getId()) || !request.getEvent().getId().equals(eventId)){
+        if (!userId.equals(event.getInitiator().getId()) || !request.getEvent().getId().equals(eventId)) {
             throw new ForbiddenException("Incorrect data");
         }
         if (event.getParticipantLimit() == 0 || !event.isRequestModeration()) {
@@ -114,15 +106,7 @@ public class PrivateEventsServiceImpl implements PrivateEventsService {
             throw new ValidationException("Достигнут лимит по участию в эвенте");
         }
         request.setStatus(RequestState.CONFIRMED);
-        //event.setConfirmedRequests(event.getConfirmedRequests() + 1);
-        //eventRepository.save(event);
-        /*if (event.getConfirmedRequests().equals(event.getParticipantLimit())) {
-            List<Request> toCancelRequests = requestRepository.findAllByEventIdAndStatus(eventId, RequestState.PENDING);
-            for (Request toCancelRequest : toCancelRequests) {
-                toCancelRequest.setStatus(RequestState.REJECTED);
-            }
-            requestRepository.saveAll(toCancelRequests);
-        }*/
+
         if (confirmedRequests == event.getParticipantLimit()) {
             List<Request> toCancelRequests = requestRepository.findAllByEventIdAndStatus(eventId, RequestState.PENDING);
             for (Request toCancelRequest : toCancelRequests) {
@@ -141,9 +125,9 @@ public class PrivateEventsServiceImpl implements PrivateEventsService {
         userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User not found!"));
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new NotFoundException("Event not found"));
-        if (userId.equals(event.getInitiator().getId())){
+        if (userId.equals(event.getInitiator().getId())) {
             request.setStatus(RequestState.REJECTED);
-        }else {
+        } else {
             throw new ForbiddenException("Incorrect data");
         }
         return requestMapper.mapToParticipationRequestDto(requestRepository.save(request));
@@ -162,10 +146,9 @@ public class PrivateEventsServiceImpl implements PrivateEventsService {
                 event.setState(EventState.PENDING);
             }
             BeanUtils.copyProperties(updateEventDto, event, getNullPropertyNames(updateEventDto));
-        }else {
+        } else {
             throw new ForbiddenException("Incorrect data");
         }
-        //int confirmedRequests = requestRepository.findConfirmedRequests(event.getId(), RequestState.CONFIRMED);
         Long confirmedRequests = requestRepository.findConfirmedRequests(event.getId(), RequestState.CONFIRMED);
         Long views = hitService.getViewsForEvent(event, false);
         return eventMapper.mapToEventFullDto(event, confirmedRequests, views);
@@ -174,15 +157,12 @@ public class PrivateEventsServiceImpl implements PrivateEventsService {
     @Override
     @Transactional
     public EventFullDto cancel(Long userId, Long eventId) {
-        Event event = eventRepository.findById(eventId)
-                .orElseThrow(() -> new NotFoundException("Event not found"));
-        userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User not found!"));
-        if (userId.equals(event.getInitiator().getId()) && event.getState().equals(EventState.PENDING)) {
+        Event event = eventRepository.findByIdAndInitiatorId(eventId, userId).orElseThrow(() -> new NotFoundException("Event not found"));
+        if (event.getState().equals(EventState.PENDING)) {
             event.setState(EventState.CANCELED);
-        }else {
+        } else {
             throw new ForbiddenException("Incorrect data");
         }
-        //int confirmedRequests = requestRepository.findConfirmedRequests(eventId, RequestState.CONFIRMED);
         Long confirmedRequests = requestRepository.findConfirmedRequests(event.getId(), RequestState.CONFIRMED);
         Long views = hitService.getViewsForEvent(event, false);
         return eventMapper.mapToEventFullDto(event, confirmedRequests, views);

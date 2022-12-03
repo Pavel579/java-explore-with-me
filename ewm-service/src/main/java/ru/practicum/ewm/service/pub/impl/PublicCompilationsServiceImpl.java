@@ -30,11 +30,7 @@ public class PublicCompilationsServiceImpl implements PublicCompilationsService 
     public CompilationDto getById(Long compId) {
         Compilation compilation = compilationRepository.findById(compId)
                 .orElseThrow(() -> new NotFoundException("Compilation not found!"));
-        List<Long> eventsIds = new ArrayList<>();
-        eventsIds = compilation.getEvents().stream().map(Event::getId).collect(Collectors.toList());
-        /*for (Event e : compilation.getEvents()) {
-            eventsIds.add(e.getId());
-        }*/
+        List<Long> eventsIds = compilation.getEvents().stream().map(Event::getId).collect(Collectors.toList());
         List<Event> events = eventRepository.findAllById(eventsIds);
         List<EventShortDto> eventsShort = eventMapper.mapToListEventShortDto(events);
         return compilationMapper.mapToCompilationDto(compilation, eventsShort);
@@ -45,7 +41,7 @@ public class PublicCompilationsServiceImpl implements PublicCompilationsService 
         List<Compilation> compilations = compilationRepository.findAllByPinned(pinned, pageRequest);
         List<CompilationDto> result = new ArrayList<>();
         for (Compilation compilation : compilations) {
-            List<EventShortDto> shortEvents = eventMapper.mapToListEventShortDto(compilation.getEvents());
+            List<EventShortDto> shortEvents = eventMapper.mapToListEventShortDto(new ArrayList<>(compilation.getEvents()));
             result.add(compilationMapper.mapToCompilationDto(compilation, shortEvents));
         }
         return result;

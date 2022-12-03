@@ -44,14 +44,12 @@ create table if not exists events
     category_id        bigint    not null
         constraint events_categories_id_fk
             references categories,
-    --confirmed_requests bigint,
     event_date         timestamp not null,
     initiator_id       bigint    not null
         constraint events_users_id_fk
             references users,
     paid               boolean   not null,
     title              varchar   not null,
-    --views              integer,
     created_on         timestamp,
     description        varchar,
     location_id        bigint    not null
@@ -66,11 +64,7 @@ create table if not exists events
 create table if not exists compilation_events
 (
     event_id       bigint,
-        --constraint compilation_events_events_id_fk
-          --  references events,
     compilation_id bigint,
-        --constraint compilation_events_compilations_id_fk
-          --  references compilations,
     primary key (event_id, compilation_id)
 );
 

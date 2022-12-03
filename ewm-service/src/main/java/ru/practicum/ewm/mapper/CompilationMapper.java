@@ -8,10 +8,11 @@ import ru.practicum.ewm.model.Compilation;
 import ru.practicum.ewm.model.Event;
 
 import java.util.List;
+import java.util.Set;
 
 @Component
 public class CompilationMapper {
-    public Compilation mapToCompilation(NewCompilationDto newCompilationDto, List<Event> events) {
+    public Compilation mapToCompilation(NewCompilationDto newCompilationDto, Set<Event> events) {
         return new Compilation(
                 null,
                 events,
