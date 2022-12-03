@@ -1,21 +1,24 @@
 package ru.practicum.ewm.model;
 
 import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.hibernate.Hibernate;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-@EqualsAndHashCode
 @Entity
 @Table(name = "events")
 public class Event {
@@ -29,8 +32,8 @@ public class Event {
     private Category category;
     @Column(name = "created_on")
     private LocalDateTime createdOn;
-    @Column(name = "confirmed_requests")
-    private Integer confirmedRequests;
+    //@Transient
+    //private Long confirmedRequests = 0L;
     @ManyToOne
     @JoinColumn(name = "initiator_id")
     private User initiator;
@@ -43,18 +46,33 @@ public class Event {
     @JoinColumn(name = "location_id")
     private Location location;
     @Column(name = "paid", nullable = false)
-    private Boolean paid;
+    private boolean paid;
     @Column(name = "participant_limit")
-    private Integer participantLimit;
+    private int participantLimit;
     @Column(name = "published_on")
     private LocalDateTime publishedOn;
     @Column(name = "request_moderation")
-    private Boolean requestModeration;
+    private boolean requestModeration;
     @Enumerated(EnumType.STRING)
     @Column(name = "state")
     private EventState state;
     @Column(name = "title", nullable = false)
     private String title;
-    @Column(name = "views")
-    private Integer views;
+    //private Integer views;
+    /*@OneToMany
+    @JoinColumn(name = "event_id")
+    private final List<Request> requests = new ArrayList<>();*/
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        Event event = (Event) o;
+        return id != null && Objects.equals(id, event.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 }

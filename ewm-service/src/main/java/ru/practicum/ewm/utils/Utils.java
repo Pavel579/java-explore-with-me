@@ -1,11 +1,13 @@
 package ru.practicum.ewm.utils;
 
+import lombok.experimental.UtilityClass;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
 
 import java.util.HashSet;
 import java.util.Set;
 
+@UtilityClass
 public class Utils {
     public static String[] getNullPropertyNames(Object source) {
         final BeanWrapper src = new BeanWrapperImpl(source);

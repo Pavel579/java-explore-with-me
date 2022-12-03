@@ -44,14 +44,14 @@ create table if not exists events
     category_id        bigint    not null
         constraint events_categories_id_fk
             references categories,
-    confirmed_requests bigint,
+    --confirmed_requests bigint,
     event_date         timestamp not null,
     initiator_id       bigint    not null
         constraint events_users_id_fk
             references users,
     paid               boolean   not null,
     title              varchar   not null,
-    views              integer,
+    --views              integer,
     created_on         timestamp,
     description        varchar,
     location_id        bigint    not null

@@ -26,17 +26,17 @@ public class StatsServiceImpl implements StatsService {
     }
 
     @Override
-    public List<ViewStatsDto> getStats(String start, String end, List<String> uris, Boolean unique) {
+    public List<ViewStatsDto> getStats(LocalDateTime start, LocalDateTime end, List<String> uris, Boolean unique) {
         DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        LocalDateTime startFrom = LocalDateTime.parse(start, format);
-        LocalDateTime endBefore = LocalDateTime.parse(end, format);
+        //LocalDateTime startFrom = LocalDateTime.parse(start, format);
+        //LocalDateTime endBefore = LocalDateTime.parse(end, format);
         if (uris == null || uris.isEmpty()) {
             return Collections.emptyList();
         }
         if (!unique) {
-            return statsRepository.findAll(startFrom, endBefore, uris);
+            return statsRepository.findAll(start, end, uris);
         } else {
-            return statsRepository.findAllUnique(startFrom, endBefore, uris);
+            return statsRepository.findAllUnique(start, end, uris);
         }
     }
 }
