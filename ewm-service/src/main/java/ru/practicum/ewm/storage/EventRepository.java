@@ -30,4 +30,6 @@ public interface EventRepository extends JpaRepository<Event, Long> {
 
     Optional<Event> findByIdAndInitiatorId(Long eventId, Long userId);
 
+    @Query(value = "select * from events e join compilation_events ce on e.id = ce.event_id where ce.compilation_id in (:ids)", nativeQuery = true)
+    List<Event> findAllByCompilations(List<Long> ids);
 }

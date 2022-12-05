@@ -39,7 +39,7 @@ public class EventMapper {
                 event.isRequestModeration(),
                 event.getState(),
                 event.getTitle(),
-                views
+                views == null ? 0 : views
         );
     }
 
@@ -72,7 +72,7 @@ public class EventMapper {
                 userMapper.mapToUserShortDto(event.getInitiator()),
                 event.isPaid(),
                 event.getTitle(),
-                views
+                views == null ? 0 : views
         );
     }
 

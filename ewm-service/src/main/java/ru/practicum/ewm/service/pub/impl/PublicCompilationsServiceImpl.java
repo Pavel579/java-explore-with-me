@@ -35,8 +35,7 @@ public class PublicCompilationsServiceImpl implements PublicCompilationsService 
     public CompilationDto getById(Long compId) {
         Compilation compilation = compilationRepository.findById(compId)
                 .orElseThrow(() -> new NotFoundException("Compilation not found!"));
-        List<Long> eventsIds = compilation.getEvents().stream().map(Event::getId).collect(Collectors.toList());
-        List<Event> events = eventRepository.findAllById(eventsIds);
+        List<Event> events = new ArrayList<>(compilation.getEvents());
         Map<Long, Long> confirmedRequests = adminCompilationsService.getConfirmedRequests(events);
         Map<Long, Long> views = hitService.getViewsForEvents(events, false);
         List<EventShortDto> eventsShort = eventMapper.mapToListEventShortDto(events, confirmedRequests, views);
@@ -46,10 +45,8 @@ public class PublicCompilationsServiceImpl implements PublicCompilationsService 
     @Override
     public List<CompilationDto> getByParams(Boolean pinned, PageRequest pageRequest) {
         List<Compilation> compilations = compilationRepository.findAllByPinned(pinned, pageRequest);
-        List<Event> eventList = new ArrayList<>();
-        for (Compilation compilation : compilations) {
-            eventList.addAll(compilation.getEvents());
-        }
+        List<Long> compilationIds = compilations.stream().map(Compilation::getId).collect(Collectors.toList());
+        List<Event> eventList = eventRepository.findAllByCompilations(compilationIds);
         Map<Long, Long> confirmedRequests = adminCompilationsService.getConfirmedRequests(eventList);
         Map<Long, Long> views = hitService.getViewsForEvents(eventList, false);
         return compilationMapper.mapToListCompilationDto(compilations, confirmedRequests, views);

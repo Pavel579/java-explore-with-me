@@ -118,7 +118,7 @@ public class PrivateEventsServiceImpl implements PrivateEventsService {
                 toCancelRequest.setStatus(RequestState.REJECTED);
             }
         }
-        return requestMapper.mapToParticipationRequestDto(requestRepository.save(request));
+        return requestMapper.mapToParticipationRequestDto(request);
     }
 
     @Override

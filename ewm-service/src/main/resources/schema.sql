@@ -65,7 +65,10 @@ create table if not exists compilation_events
 (
     event_id       bigint,
     compilation_id bigint,
-    primary key (event_id, compilation_id)
+    primary key (event_id, compilation_id),
+    CONSTRAINT fk_compiled_events_compilations FOREIGN KEY (compilation_id)
+    REFERENCES compilations (id) ON DELETE CASCADE,
+    CONSTRAINT fk_compiled_events_events FOREIGN KEY (event_id) REFERENCES events (id)
 );
 
 create table if not exists requests
