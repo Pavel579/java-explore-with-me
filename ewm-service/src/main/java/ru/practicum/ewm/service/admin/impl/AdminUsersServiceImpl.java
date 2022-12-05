@@ -32,7 +32,12 @@ public class AdminUsersServiceImpl implements AdminUsersService {
 
     @Override
     public List<UserDto> getAll(List<Long> ids, PageRequest pageRequest) {
-        List<User> users = userRepository.findAllByIdIn(ids, pageRequest);
+        List<User> users;
+        if (ids != null && !ids.isEmpty()) {
+            users = userRepository.findAllByIdIn(ids, pageRequest);
+        } else {
+            users = userRepository.findAll(pageRequest).toList();
+        }
         return userMapper.mapToListUserDto(users);
     }
 

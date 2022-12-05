@@ -25,7 +25,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
 
     List<Event> findAll(Specification<Event> specification, Pageable pageable);
 
-    @Query("select e.id, (select count(r) from Event ev left join Request r on ev.id = r.event.id where r.status = ?1 and ev.id in ?2) from Event e where e.id in ?2")
+    @Query("select e.id, (select count(r) from Request r where r.status = ?1 and r.event.id = e.id) from Event e where e.id in ?2 group by e.id")
     List<Long[]> countAllConfirmedRequests(RequestState name, List<Long> eventsIdsList);
 
     Optional<Event> findByIdAndInitiatorId(Long eventId, Long userId);

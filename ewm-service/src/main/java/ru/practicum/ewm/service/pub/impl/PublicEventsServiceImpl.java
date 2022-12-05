@@ -12,6 +12,7 @@ import ru.practicum.ewm.model.Event;
 import ru.practicum.ewm.model.EventState;
 import ru.practicum.ewm.model.Request;
 import ru.practicum.ewm.model.RequestState;
+import ru.practicum.ewm.service.admin.AdminCompilationsService;
 import ru.practicum.ewm.service.hits.HitService;
 import ru.practicum.ewm.service.pub.PublicEventsService;
 import ru.practicum.ewm.storage.EventRepository;
@@ -24,15 +25,19 @@ import javax.persistence.criteria.Subquery;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
 public class PublicEventsServiceImpl implements PublicEventsService {
     private final HitService hitService;
+    private final AdminCompilationsService adminCompilationsService;
     private final EventRepository eventRepository;
     private final RequestRepository requestRepository;
     private final EventMapper eventMapper;
+    private LocalDateTime start;
+    private LocalDateTime end;
 
     @Override
     public EventFullDto getById(Long id) {
@@ -46,8 +51,6 @@ public class PublicEventsServiceImpl implements PublicEventsService {
     public List<EventShortDto> getAll(String text, List<Long> categories,
                                       Boolean paid, LocalDateTime rangeStart, LocalDateTime rangeEnd,
                                       Boolean onlyAvailable, PageRequest pageRequest) {
-        LocalDateTime start;
-        LocalDateTime end;
         start = Objects.requireNonNullElseGet(rangeStart, () -> LocalDateTime.of(1970, 12, 2, 0, 0));
         end = Objects.requireNonNullElseGet(rangeEnd, () -> LocalDateTime.of(3000, 12, 2, 0, 0));
 
@@ -83,6 +86,8 @@ public class PublicEventsServiceImpl implements PublicEventsService {
 
         List<Event> events = eventRepository.findAll(specification, pageRequest);
 
-        return eventMapper.mapToListEventShortDto(events);
+        Map<Long, Long> confirmedRequests = adminCompilationsService.getConfirmedRequests(events);
+        Map<Long, Long> views = hitService.getViewsForEvents(events, false);
+        return eventMapper.mapToListEventShortDto(events, confirmedRequests, views);
     }
 }

@@ -33,16 +33,16 @@ public class PrivateRequestsServiceImpl implements PrivateRequestsService {
     @Transactional
     public ParticipationRequestDto create(Long userId, Long eventId) {
         Request request = requestRepository.findByRequesterIdAndEventId(userId, eventId);
-        Event event = eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException("Event not found!"));
-        User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User not found!"));
-        Long confirmedRequests = requestRepository.findConfirmedRequests(event.getId(), RequestState.CONFIRMED);
         if (request != null) {
             throw new RequestAlreadyExistsException("Request already exists!");
         }
+        Event event = eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException("Event not found!"));
+        Long confirmedRequests = requestRepository.findConfirmedRequests(event.getId(), RequestState.CONFIRMED);
         if (event.getInitiator().getId().equals(userId) || !event.getState().equals(EventState.PUBLISHED)
                 || (event.getParticipantLimit() > 0 && event.getParticipantLimit() - confirmedRequests <= 0)) {
             throw new RequestAlreadyExistsException("Bad request!!");
         }
+        User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User not found!"));
         Request saveRequest = requestRepository.save(requestMapper.mapToRequest(user, event));
         return requestMapper.mapToParticipationRequestDto(saveRequest);
     }

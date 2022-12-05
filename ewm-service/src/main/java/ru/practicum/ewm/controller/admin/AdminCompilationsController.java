@@ -2,7 +2,6 @@ package ru.practicum.ewm.controller.admin;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,16 +13,17 @@ import ru.practicum.ewm.dto.compilation.CompilationDto;
 import ru.practicum.ewm.dto.compilation.NewCompilationDto;
 import ru.practicum.ewm.service.admin.AdminCompilationsService;
 
+import javax.validation.Valid;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(path = "/admin/compilations")
-@Validated
 @Slf4j
 public class AdminCompilationsController {
     private final AdminCompilationsService adminCompilationsService;
 
     @PostMapping()
-    public CompilationDto create(@Validated @RequestBody NewCompilationDto newCompilationDto) {
+    public CompilationDto create(@Valid @RequestBody NewCompilationDto newCompilationDto) {
         return adminCompilationsService.create(newCompilationDto);
     }
 

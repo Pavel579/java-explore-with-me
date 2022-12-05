@@ -14,6 +14,7 @@ import ru.practicum.ewm.mapper.EventMapper;
 import ru.practicum.ewm.model.Event;
 import ru.practicum.ewm.model.EventState;
 import ru.practicum.ewm.model.RequestState;
+import ru.practicum.ewm.service.admin.AdminCompilationsService;
 import ru.practicum.ewm.service.admin.AdminEventsService;
 import ru.practicum.ewm.service.hits.HitService;
 import ru.practicum.ewm.storage.EventRepository;
@@ -23,6 +24,7 @@ import javax.persistence.criteria.Predicate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import static ru.practicum.ewm.utils.Utils.getNullPropertyNames;
@@ -33,9 +35,12 @@ import static ru.practicum.ewm.utils.Utils.getNullPropertyNames;
 @Slf4j
 public class AdminEventsServiceImpl implements AdminEventsService {
     private final HitService hitService;
+    private final AdminCompilationsService adminCompilationsService;
     private final EventRepository eventRepository;
     private final RequestRepository requestRepository;
     private final EventMapper eventMapper;
+    private LocalDateTime start;
+    private LocalDateTime end;
 
     @Override
     @Transactional
@@ -43,7 +48,6 @@ public class AdminEventsServiceImpl implements AdminEventsService {
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException("Event not found"));
         if (event.getEventDate().minusHours(1).isAfter(LocalDateTime.now()) && event.getState().equals(EventState.PENDING)) {
             event.setState(EventState.PUBLISHED);
-            eventRepository.save(event);
             Long confirmedRequests = requestRepository.findConfirmedRequests(event.getId(), RequestState.CONFIRMED);
             Long views = hitService.getViewsForEvent(event, false);
             return eventMapper.mapToEventFullDto(event, confirmedRequests, views);
@@ -58,7 +62,6 @@ public class AdminEventsServiceImpl implements AdminEventsService {
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException("Event not found!"));
         if (!event.getState().equals(EventState.PUBLISHED)) {
             event.setState(EventState.CANCELED);
-            eventRepository.save(event);
             Long confirmedRequests = requestRepository.findConfirmedRequests(event.getId(), RequestState.CONFIRMED);
             Long views = hitService.getViewsForEvent(event, false);
             return eventMapper.mapToEventFullDto(event, confirmedRequests, views);
@@ -72,8 +75,6 @@ public class AdminEventsServiceImpl implements AdminEventsService {
                                           LocalDateTime rangeStart, LocalDateTime rangeEnd,
                                           PageRequest pageRequest) {
         log.debug("get events start service");
-        LocalDateTime start;
-        LocalDateTime end;
         start = Objects.requireNonNullElseGet(rangeStart, () -> LocalDateTime.of(1970, 12, 2, 0, 0));
         end = Objects.requireNonNullElseGet(rangeEnd, () -> LocalDateTime.of(3000, 12, 2, 0, 0));
 
@@ -99,9 +100,10 @@ public class AdminEventsServiceImpl implements AdminEventsService {
 
         List<Event> events = eventRepository.findAll(specification, pageRequest);
 
-        return eventMapper.mapToListEventFullDto(events);
+        Map<Long, Long> confirmedRequests = adminCompilationsService.getConfirmedRequests(events);
+        Map<Long, Long> views = hitService.getViewsForEvents(events, false);
+        return eventMapper.mapToListEventFullDto(events, confirmedRequests, views);
     }
-
 
     @Override
     @Transactional

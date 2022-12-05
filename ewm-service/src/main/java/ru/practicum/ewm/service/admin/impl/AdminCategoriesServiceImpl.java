@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.ewm.dto.category.CategoryDto;
+import ru.practicum.ewm.exceptions.ForbiddenException;
 import ru.practicum.ewm.mapper.CategoryMapper;
 import ru.practicum.ewm.model.Category;
 import ru.practicum.ewm.model.Event;
@@ -46,6 +47,8 @@ public class AdminCategoriesServiceImpl implements AdminCategoriesService {
         publicCategoriesService.getById(catId);
         if (events.isEmpty()) {
             categoryRepository.deleteById(catId);
+        } else {
+            throw new ForbiddenException("Event has this category");
         }
     }
 }

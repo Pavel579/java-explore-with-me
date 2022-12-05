@@ -12,13 +12,18 @@ import ru.practicum.ewm.mapper.CompilationMapper;
 import ru.practicum.ewm.mapper.EventMapper;
 import ru.practicum.ewm.model.Compilation;
 import ru.practicum.ewm.model.Event;
+import ru.practicum.ewm.model.RequestState;
 import ru.practicum.ewm.service.admin.AdminCompilationsService;
+import ru.practicum.ewm.service.hits.HitService;
 import ru.practicum.ewm.storage.CompilationRepository;
 import ru.practicum.ewm.storage.EventRepository;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +34,7 @@ public class AdminCompilationsServiceImpl implements AdminCompilationsService {
     private final CompilationRepository compilationRepository;
     private final EventMapper eventMapper;
     private final CompilationMapper compilationMapper;
+    private final HitService hitService;
 
     @Override
     @Transactional
@@ -36,7 +42,9 @@ public class AdminCompilationsServiceImpl implements AdminCompilationsService {
         Set<Event> events = eventRepository.findAllByIdIn(newCompilationDto.getEvents());
         Compilation compilation = compilationMapper.mapToCompilation(newCompilationDto, events);
         compilationRepository.save(compilation);
-        List<EventShortDto> shortEvents = eventMapper.mapToListEventShortDto(new ArrayList<>(events));
+        Map<Long, Long> confirmedRequests = getConfirmedRequests(new ArrayList<>(events));
+        Map<Long, Long> views = hitService.getViewsForEvents(new ArrayList<>(events), false);
+        List<EventShortDto> shortEvents = eventMapper.mapToListEventShortDto(new ArrayList<>(events), confirmedRequests, views);
         return compilationMapper.mapToCompilationDto(compilation, shortEvents);
     }
 
@@ -53,7 +61,6 @@ public class AdminCompilationsServiceImpl implements AdminCompilationsService {
                 .orElseThrow(() -> new NotFoundException("Compilation not found!"));
         Set<Event> events = compilation.getEvents();
         events.removeIf(e -> e.getId().equals(eventId));
-        compilationRepository.save(compilation);
     }
 
     @Override
@@ -64,7 +71,6 @@ public class AdminCompilationsServiceImpl implements AdminCompilationsService {
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new NotFoundException("Event not found!"));
         compilation.getEvents().add(event);
-        compilationRepository.save(compilation);
 
     }
 
@@ -74,7 +80,6 @@ public class AdminCompilationsServiceImpl implements AdminCompilationsService {
         Compilation compilation = compilationRepository.findById(compId)
                 .orElseThrow(() -> new NotFoundException("Compilation not found!"));
         compilation.setPinned(false);
-        compilationRepository.save(compilation);
     }
 
     @Override
@@ -83,6 +88,15 @@ public class AdminCompilationsServiceImpl implements AdminCompilationsService {
         Compilation compilation = compilationRepository.findById(compId)
                 .orElseThrow(() -> new NotFoundException("Compilation not found!"));
         compilation.setPinned(true);
-        compilationRepository.save(compilation);
+    }
+
+    public Map<Long, Long> getConfirmedRequests(List<Event> events) {
+        Map<Long, Long> confirmedRequests = new HashMap<>();
+        List<Long> eventsIdsList = events.stream().map(Event::getId).collect(Collectors.toList());
+        List<Long[]> list = eventRepository.countAllConfirmedRequests(RequestState.CONFIRMED, eventsIdsList);
+        for (Long[] counts : list) {
+            confirmedRequests.put(counts[0], counts[1]);
+        }
+        return confirmedRequests;
     }
 }

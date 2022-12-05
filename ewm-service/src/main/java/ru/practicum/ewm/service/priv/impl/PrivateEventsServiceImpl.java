@@ -25,6 +25,7 @@ import ru.practicum.ewm.model.Location;
 import ru.practicum.ewm.model.Request;
 import ru.practicum.ewm.model.RequestState;
 import ru.practicum.ewm.model.User;
+import ru.practicum.ewm.service.admin.AdminCompilationsService;
 import ru.practicum.ewm.service.admin.AdminUsersService;
 import ru.practicum.ewm.service.hits.HitService;
 import ru.practicum.ewm.service.priv.PrivateEventsService;
@@ -36,6 +37,7 @@ import ru.practicum.ewm.storage.UserRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 import static ru.practicum.ewm.utils.Utils.getNullPropertyNames;
 
@@ -51,6 +53,7 @@ public class PrivateEventsServiceImpl implements PrivateEventsService {
     private final EventMapper eventMapper;
     private final RequestMapper requestMapper;
     private final AdminUsersService adminUsersService;
+    private final AdminCompilationsService adminCompilationsService;
     private final PublicCategoriesService publicCategoriesService;
     private final HitService hitService;
     private final UserMapper userMapper;
@@ -72,7 +75,9 @@ public class PrivateEventsServiceImpl implements PrivateEventsService {
     @Override
     public List<EventShortDto> getByUser(Long userId, PageRequest pageRequest) {
         List<Event> event = eventRepository.findAllByInitiatorId(userId, pageRequest);
-        return eventMapper.mapToListEventShortDto(event);
+        Map<Long, Long> confirmedRequests = adminCompilationsService.getConfirmedRequests(event);
+        Map<Long, Long> views = hitService.getViewsForEvents(event, false);
+        return eventMapper.mapToListEventShortDto(event, confirmedRequests, views);
     }
 
     @Override
@@ -112,7 +117,6 @@ public class PrivateEventsServiceImpl implements PrivateEventsService {
             for (Request toCancelRequest : toCancelRequests) {
                 toCancelRequest.setStatus(RequestState.REJECTED);
             }
-            requestRepository.saveAll(toCancelRequests);
         }
         return requestMapper.mapToParticipationRequestDto(requestRepository.save(request));
     }
@@ -130,7 +134,7 @@ public class PrivateEventsServiceImpl implements PrivateEventsService {
         } else {
             throw new ForbiddenException("Incorrect data");
         }
-        return requestMapper.mapToParticipationRequestDto(requestRepository.save(request));
+        return requestMapper.mapToParticipationRequestDto(request);
     }
 
     @Override

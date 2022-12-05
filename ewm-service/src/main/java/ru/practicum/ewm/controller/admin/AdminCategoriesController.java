@@ -18,7 +18,6 @@ import ru.practicum.ewm.utils.Update;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(path = "/admin/categories")
-@Validated
 @Slf4j
 public class AdminCategoriesController {
     private final AdminCategoriesService adminCategoriesService;

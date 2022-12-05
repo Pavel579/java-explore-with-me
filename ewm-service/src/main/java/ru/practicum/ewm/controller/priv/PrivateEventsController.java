@@ -20,6 +20,7 @@ import ru.practicum.ewm.dto.request.ParticipationRequestDto;
 import ru.practicum.ewm.service.priv.PrivateEventsService;
 import ru.practicum.ewm.utils.Create;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
@@ -40,7 +41,7 @@ public class PrivateEventsController {
     }
 
     @PatchMapping()
-    public EventFullDto update(@Validated @RequestBody UpdateEventRequestDto updateEventDto,
+    public EventFullDto update(@Valid @RequestBody UpdateEventRequestDto updateEventDto,
                                @PathVariable Long userId) {
         return privateEventsService.update(updateEventDto, userId);
     }
