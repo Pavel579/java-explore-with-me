@@ -7,6 +7,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.ewm.dto.event.EventFullDto;
+import ru.practicum.ewm.dto.event.EventFullWeatherDto;
 import ru.practicum.ewm.dto.event.EventShortDto;
 import ru.practicum.ewm.dto.event.NewEventDto;
 import ru.practicum.ewm.dto.event.UpdateEventRequestDto;
@@ -72,7 +73,7 @@ public class PrivateEventsServiceImpl implements PrivateEventsService {
         log.debug("priv service create end");
         Long confirmedRequests = requestRepository.findConfirmedRequests(event.getId(), RequestState.CONFIRMED);
         Long views = hitService.getViewsForEvent(event, false);
-        return eventMapper.mapToEventFullDto(event, confirmedRequests, views, null);
+        return eventMapper.mapToEventFullDto(event, confirmedRequests, views);
     }
 
     @Override
@@ -84,7 +85,7 @@ public class PrivateEventsServiceImpl implements PrivateEventsService {
     }
 
     @Override
-    public EventFullDto getByUserIdAndEventId(Long userId, Long eventId) {
+    public EventFullWeatherDto getByUserIdAndEventId(Long userId, Long eventId) {
         Event event = eventRepository.findAllByInitiatorIdAndId(userId, eventId);
         Long confirmedRequests = requestRepository.findConfirmedRequests(eventId, RequestState.CONFIRMED);
         Long views = hitService.getViewsForEvent(event, false);
@@ -92,7 +93,7 @@ public class PrivateEventsServiceImpl implements PrivateEventsService {
         if (event.getEventDate().minusHours(24).isBefore(LocalDateTime.now()) && event.getState().equals(EventState.PUBLISHED)) {
             weather = weatherService.getCurrentWeather(event.getLocation());
         }
-        return eventMapper.mapToEventFullDto(event, confirmedRequests, views, weather);
+        return eventMapper.mapToEventFullWeatherDto(event, confirmedRequests, views, weather);
     }
 
 
@@ -162,7 +163,7 @@ public class PrivateEventsServiceImpl implements PrivateEventsService {
         }
         Long confirmedRequests = requestRepository.findConfirmedRequests(event.getId(), RequestState.CONFIRMED);
         Long views = hitService.getViewsForEvent(event, false);
-        return eventMapper.mapToEventFullDto(event, confirmedRequests, views, null);
+        return eventMapper.mapToEventFullDto(event, confirmedRequests, views);
     }
 
     @Override
@@ -176,6 +177,6 @@ public class PrivateEventsServiceImpl implements PrivateEventsService {
         }
         Long confirmedRequests = requestRepository.findConfirmedRequests(event.getId(), RequestState.CONFIRMED);
         Long views = hitService.getViewsForEvent(event, false);
-        return eventMapper.mapToEventFullDto(event, confirmedRequests, views, null);
+        return eventMapper.mapToEventFullDto(event, confirmedRequests, views);
     }
 }

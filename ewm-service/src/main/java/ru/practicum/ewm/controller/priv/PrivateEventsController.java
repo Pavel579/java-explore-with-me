@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.ewm.dto.event.EventFullDto;
+import ru.practicum.ewm.dto.event.EventFullWeatherDto;
 import ru.practicum.ewm.dto.event.EventShortDto;
 import ru.practicum.ewm.dto.event.NewEventDto;
 import ru.practicum.ewm.dto.event.UpdateEventRequestDto;
@@ -57,7 +58,7 @@ public class PrivateEventsController {
     }
 
     @GetMapping("/{eventId}")
-    public EventFullDto getByUserIdAndEventId(@PathVariable Long userId, @PathVariable Long eventId) {
+    public EventFullWeatherDto getByUserIdAndEventId(@PathVariable Long userId, @PathVariable Long eventId) {
         log.debug("get event by id contr");
         return privateEventsService.getByUserIdAndEventId(userId, eventId);
     }

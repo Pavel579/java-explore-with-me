@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.practicum.ewm.dto.category.CategoryDto;
 import ru.practicum.ewm.dto.user.UserShortDto;
+import ru.practicum.ewm.dto.weather.WeatherResponseDto;
 import ru.practicum.ewm.model.EventState;
 import ru.practicum.ewm.model.Location;
 
@@ -14,7 +15,7 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class EventFullDto {
+public class EventFullWeatherDto {
     private Long id;
     private String annotation;
     private CategoryDto category;
@@ -34,4 +35,5 @@ public class EventFullDto {
     private EventState state;
     private String title;
     private Long views;
+    private WeatherResponseDto weather;
 }

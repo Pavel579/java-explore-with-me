@@ -51,7 +51,7 @@ public class AdminEventsServiceImpl implements AdminEventsService {
             event.setPublishedOn(LocalDateTime.now());
             Long confirmedRequests = requestRepository.findConfirmedRequests(event.getId(), RequestState.CONFIRMED);
             Long views = hitService.getViewsForEvent(event, false);
-            return eventMapper.mapToEventFullDto(event, confirmedRequests, views, null);
+            return eventMapper.mapToEventFullDto(event, confirmedRequests, views);
         } else {
             throw new NotFoundException("Can't publish event");
         }
@@ -65,7 +65,7 @@ public class AdminEventsServiceImpl implements AdminEventsService {
             event.setState(EventState.CANCELED);
             Long confirmedRequests = requestRepository.findConfirmedRequests(event.getId(), RequestState.CONFIRMED);
             Long views = hitService.getViewsForEvent(event, false);
-            return eventMapper.mapToEventFullDto(event, confirmedRequests, views, null);
+            return eventMapper.mapToEventFullDto(event, confirmedRequests, views);
         } else {
             throw new NotFoundException("Can't reject event");
         }
@@ -113,6 +113,6 @@ public class AdminEventsServiceImpl implements AdminEventsService {
         BeanUtils.copyProperties(adminUpdateEventRequestDto, event, getNullPropertyNames(adminUpdateEventRequestDto));
         Long confirmedRequests = requestRepository.findConfirmedRequests(event.getId(), RequestState.CONFIRMED);
         Long views = hitService.getViewsForEvent(event, false);
-        return eventMapper.mapToEventFullDto(event, confirmedRequests, views, null);
+        return eventMapper.mapToEventFullDto(event, confirmedRequests, views);
     }
 }

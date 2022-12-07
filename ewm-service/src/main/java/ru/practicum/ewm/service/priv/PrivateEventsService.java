@@ -2,6 +2,7 @@ package ru.practicum.ewm.service.priv;
 
 import org.springframework.data.domain.PageRequest;
 import ru.practicum.ewm.dto.event.EventFullDto;
+import ru.practicum.ewm.dto.event.EventFullWeatherDto;
 import ru.practicum.ewm.dto.event.EventShortDto;
 import ru.practicum.ewm.dto.event.NewEventDto;
 import ru.practicum.ewm.dto.event.UpdateEventRequestDto;
@@ -14,7 +15,7 @@ public interface PrivateEventsService {
 
     List<EventShortDto> getByUser(Long userId, PageRequest pageRequest);
 
-    EventFullDto getByUserIdAndEventId(Long userId, Long eventId);
+    EventFullWeatherDto getByUserIdAndEventId(Long userId, Long eventId);
 
     List<ParticipationRequestDto> getParticipationRequestsOfUser(Long userId, Long eventId);
 

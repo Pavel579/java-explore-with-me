@@ -3,6 +3,7 @@ package ru.practicum.ewm.mapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import ru.practicum.ewm.dto.event.EventFullDto;
+import ru.practicum.ewm.dto.event.EventFullWeatherDto;
 import ru.practicum.ewm.dto.event.EventShortDto;
 import ru.practicum.ewm.dto.event.NewEventDto;
 import ru.practicum.ewm.dto.weather.WeatherResponseDto;
@@ -23,8 +24,29 @@ public class EventMapper {
     private final CategoryMapper categoryMapper;
     private final UserMapper userMapper;
 
-    public EventFullDto mapToEventFullDto(Event event, Long confirmedRequests, Long views, WeatherResponseDto weatherResponseDto) {
+    public EventFullDto mapToEventFullDto(Event event, Long confirmedRequests, Long views) {
         return new EventFullDto(
+                event.getId(),
+                event.getAnnotation(),
+                categoryMapper.mapToCategoryDto(event.getCategory()),
+                confirmedRequests,
+                event.getCreatedOn(),
+                event.getDescription(),
+                event.getEventDate(),
+                userMapper.mapToUserShortDto(event.getInitiator()),
+                event.getLocation(),
+                event.isPaid(),
+                event.getParticipantLimit(),
+                event.getPublishedOn(),
+                event.isRequestModeration(),
+                event.getState(),
+                event.getTitle(),
+                views == null ? 0 : views
+        );
+    }
+
+    public EventFullWeatherDto mapToEventFullWeatherDto(Event event, Long confirmedRequests, Long views, WeatherResponseDto weatherResponseDto) {
+        return new EventFullWeatherDto(
                 event.getId(),
                 event.getAnnotation(),
                 categoryMapper.mapToCategoryDto(event.getCategory()),
@@ -83,6 +105,6 @@ public class EventMapper {
     }
 
     public List<EventFullDto> mapToListEventFullDto(List<Event> eventList, Map<Long, Long> confirmedRequests, Map<Long, Long> views) {
-        return eventList.stream().map(event -> this.mapToEventFullDto(event, confirmedRequests.get(event.getId()), views.get(event.getId()), null)).collect(Collectors.toList());
+        return eventList.stream().map(event -> this.mapToEventFullDto(event, confirmedRequests.get(event.getId()), views.get(event.getId()))).collect(Collectors.toList());
     }
 }
