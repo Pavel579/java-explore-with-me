@@ -11,6 +11,7 @@ import ru.practicum.ewm.dto.event.EventShortDto;
 import ru.practicum.ewm.dto.event.NewEventDto;
 import ru.practicum.ewm.dto.event.UpdateEventRequestDto;
 import ru.practicum.ewm.dto.request.ParticipationRequestDto;
+import ru.practicum.ewm.dto.weather.WeatherResponseDto;
 import ru.practicum.ewm.exceptions.ForbiddenException;
 import ru.practicum.ewm.exceptions.NotFoundException;
 import ru.practicum.ewm.exceptions.ValidationException;
@@ -30,6 +31,7 @@ import ru.practicum.ewm.service.admin.AdminUsersService;
 import ru.practicum.ewm.service.hits.HitService;
 import ru.practicum.ewm.service.priv.PrivateEventsService;
 import ru.practicum.ewm.service.pub.PublicCategoriesService;
+import ru.practicum.ewm.service.weather.WeatherService;
 import ru.practicum.ewm.storage.EventRepository;
 import ru.practicum.ewm.storage.LocationRepository;
 import ru.practicum.ewm.storage.RequestRepository;
@@ -56,6 +58,7 @@ public class PrivateEventsServiceImpl implements PrivateEventsService {
     private final AdminCompilationsService adminCompilationsService;
     private final PublicCategoriesService publicCategoriesService;
     private final HitService hitService;
+    private final WeatherService weatherService;
     private final UserMapper userMapper;
     private final CategoryMapper categoryMapper;
 
@@ -69,7 +72,7 @@ public class PrivateEventsServiceImpl implements PrivateEventsService {
         log.debug("priv service create end");
         Long confirmedRequests = requestRepository.findConfirmedRequests(event.getId(), RequestState.CONFIRMED);
         Long views = hitService.getViewsForEvent(event, false);
-        return eventMapper.mapToEventFullDto(event, confirmedRequests, views);
+        return eventMapper.mapToEventFullDto(event, confirmedRequests, views, null);
     }
 
     @Override
@@ -85,7 +88,11 @@ public class PrivateEventsServiceImpl implements PrivateEventsService {
         Event event = eventRepository.findAllByInitiatorIdAndId(userId, eventId);
         Long confirmedRequests = requestRepository.findConfirmedRequests(eventId, RequestState.CONFIRMED);
         Long views = hitService.getViewsForEvent(event, false);
-        return eventMapper.mapToEventFullDto(event, confirmedRequests, views);
+        WeatherResponseDto weather = null;
+        if (event.getEventDate().minusHours(24).isBefore(LocalDateTime.now()) && event.getState().equals(EventState.PUBLISHED)) {
+            weather = weatherService.getCurrentWeather(event.getLocation());
+        }
+        return eventMapper.mapToEventFullDto(event, confirmedRequests, views, weather);
     }
 
 
@@ -155,7 +162,7 @@ public class PrivateEventsServiceImpl implements PrivateEventsService {
         }
         Long confirmedRequests = requestRepository.findConfirmedRequests(event.getId(), RequestState.CONFIRMED);
         Long views = hitService.getViewsForEvent(event, false);
-        return eventMapper.mapToEventFullDto(event, confirmedRequests, views);
+        return eventMapper.mapToEventFullDto(event, confirmedRequests, views, null);
     }
 
     @Override
@@ -169,6 +176,6 @@ public class PrivateEventsServiceImpl implements PrivateEventsService {
         }
         Long confirmedRequests = requestRepository.findConfirmedRequests(event.getId(), RequestState.CONFIRMED);
         Long views = hitService.getViewsForEvent(event, false);
-        return eventMapper.mapToEventFullDto(event, confirmedRequests, views);
+        return eventMapper.mapToEventFullDto(event, confirmedRequests, views, null);
     }
 }

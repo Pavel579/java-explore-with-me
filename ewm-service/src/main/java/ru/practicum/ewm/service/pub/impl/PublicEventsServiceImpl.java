@@ -6,6 +6,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import ru.practicum.ewm.dto.event.EventFullDto;
 import ru.practicum.ewm.dto.event.EventShortDto;
+import ru.practicum.ewm.dto.weather.WeatherResponseDto;
 import ru.practicum.ewm.exceptions.NotFoundException;
 import ru.practicum.ewm.mapper.EventMapper;
 import ru.practicum.ewm.model.Event;
@@ -15,6 +16,7 @@ import ru.practicum.ewm.model.RequestState;
 import ru.practicum.ewm.service.admin.AdminCompilationsService;
 import ru.practicum.ewm.service.hits.HitService;
 import ru.practicum.ewm.service.pub.PublicEventsService;
+import ru.practicum.ewm.service.weather.WeatherService;
 import ru.practicum.ewm.storage.EventRepository;
 import ru.practicum.ewm.storage.RequestRepository;
 
@@ -33,6 +35,7 @@ import java.util.Objects;
 public class PublicEventsServiceImpl implements PublicEventsService {
     private final HitService hitService;
     private final AdminCompilationsService adminCompilationsService;
+    private final WeatherService weatherService;
     private final EventRepository eventRepository;
     private final RequestRepository requestRepository;
     private final EventMapper eventMapper;
@@ -44,7 +47,11 @@ public class PublicEventsServiceImpl implements PublicEventsService {
         Event event = eventRepository.findById(id).orElseThrow(() -> new NotFoundException("Event not found!"));
         Long confirmedRequests = requestRepository.findConfirmedRequests(event.getId(), RequestState.CONFIRMED);
         Long views = hitService.getViewsForEvent(event, false);
-        return eventMapper.mapToEventFullDto(event, confirmedRequests, views);
+        WeatherResponseDto weather = null;
+        if (event.getEventDate().minusHours(24).isBefore(LocalDateTime.now()) && event.getState().equals(EventState.PUBLISHED)) {
+            weather = weatherService.getCurrentWeather(event.getLocation());
+        }
+        return eventMapper.mapToEventFullDto(event, confirmedRequests, views, weather);
     }
 
     @Override

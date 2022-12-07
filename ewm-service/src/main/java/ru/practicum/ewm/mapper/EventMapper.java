@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 import ru.practicum.ewm.dto.event.EventFullDto;
 import ru.practicum.ewm.dto.event.EventShortDto;
 import ru.practicum.ewm.dto.event.NewEventDto;
+import ru.practicum.ewm.dto.weather.WeatherResponseDto;
 import ru.practicum.ewm.model.Category;
 import ru.practicum.ewm.model.Event;
 import ru.practicum.ewm.model.EventState;
@@ -22,7 +23,7 @@ public class EventMapper {
     private final CategoryMapper categoryMapper;
     private final UserMapper userMapper;
 
-    public EventFullDto mapToEventFullDto(Event event, Long confirmedRequests, Long views) {
+    public EventFullDto mapToEventFullDto(Event event, Long confirmedRequests, Long views, WeatherResponseDto weatherResponseDto) {
         return new EventFullDto(
                 event.getId(),
                 event.getAnnotation(),
@@ -39,7 +40,8 @@ public class EventMapper {
                 event.isRequestModeration(),
                 event.getState(),
                 event.getTitle(),
-                views == null ? 0 : views
+                views == null ? 0 : views,
+                weatherResponseDto
         );
     }
 
@@ -81,6 +83,6 @@ public class EventMapper {
     }
 
     public List<EventFullDto> mapToListEventFullDto(List<Event> eventList, Map<Long, Long> confirmedRequests, Map<Long, Long> views) {
-        return eventList.stream().map(event -> this.mapToEventFullDto(event, confirmedRequests.get(event.getId()), views.get(event.getId()))).collect(Collectors.toList());
+        return eventList.stream().map(event -> this.mapToEventFullDto(event, confirmedRequests.get(event.getId()), views.get(event.getId()), null)).collect(Collectors.toList());
     }
 }
