@@ -94,5 +94,8 @@ create table if not exists comments
     text      varchar not null,
     event_id  bigint  not null,
     author_id bigint  not null,
-    created   timestamp
+    created   timestamp,
+    CONSTRAINT fk_events FOREIGN KEY (event_id)
+    REFERENCES events (id) ON DELETE CASCADE,
+    CONSTRAINT fk_users FOREIGN KEY (author_id) REFERENCES users (id)
 );

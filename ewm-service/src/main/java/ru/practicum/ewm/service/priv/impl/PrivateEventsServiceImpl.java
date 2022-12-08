@@ -7,12 +7,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.ewm.dto.event.EventFullDto;
-import ru.practicum.ewm.dto.event.EventFullWeatherDto;
 import ru.practicum.ewm.dto.event.EventShortDto;
 import ru.practicum.ewm.dto.event.NewEventDto;
 import ru.practicum.ewm.dto.event.UpdateEventRequestDto;
 import ru.practicum.ewm.dto.request.ParticipationRequestDto;
-import ru.practicum.ewm.dto.weather.WeatherResponseDto;
 import ru.practicum.ewm.exceptions.ForbiddenException;
 import ru.practicum.ewm.exceptions.NotFoundException;
 import ru.practicum.ewm.exceptions.ValidationException;
@@ -85,15 +83,11 @@ public class PrivateEventsServiceImpl implements PrivateEventsService {
     }
 
     @Override
-    public EventFullWeatherDto getByUserIdAndEventId(Long userId, Long eventId) {
+    public EventFullDto getByUserIdAndEventId(Long userId, Long eventId) {
         Event event = eventRepository.findAllByInitiatorIdAndId(userId, eventId);
         Long confirmedRequests = requestRepository.findConfirmedRequests(eventId, RequestState.CONFIRMED);
         Long views = hitService.getViewsForEvent(event, false);
-        WeatherResponseDto weather = null;
-        if (event.getEventDate().minusHours(24).isBefore(LocalDateTime.now()) && event.getState().equals(EventState.PUBLISHED)) {
-            weather = weatherService.getCurrentWeather(event.getLocation());
-        }
-        return eventMapper.mapToEventFullWeatherDto(event, confirmedRequests, views, weather);
+        return weatherService.validateWeatherForEvent(event, confirmedRequests, views);
     }
 
 

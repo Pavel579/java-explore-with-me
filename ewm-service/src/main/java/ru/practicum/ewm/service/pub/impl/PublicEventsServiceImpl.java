@@ -4,9 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import ru.practicum.ewm.dto.event.EventFullWeatherDto;
+import ru.practicum.ewm.dto.event.EventFullDto;
 import ru.practicum.ewm.dto.event.EventShortDto;
-import ru.practicum.ewm.dto.weather.WeatherResponseDto;
 import ru.practicum.ewm.exceptions.NotFoundException;
 import ru.practicum.ewm.mapper.EventMapper;
 import ru.practicum.ewm.model.Event;
@@ -43,15 +42,11 @@ public class PublicEventsServiceImpl implements PublicEventsService {
     private LocalDateTime end;
 
     @Override
-    public EventFullWeatherDto getById(Long id) {
+    public EventFullDto getById(Long id) {
         Event event = eventRepository.findById(id).orElseThrow(() -> new NotFoundException("Event not found!"));
         Long confirmedRequests = requestRepository.findConfirmedRequests(event.getId(), RequestState.CONFIRMED);
         Long views = hitService.getViewsForEvent(event, false);
-        WeatherResponseDto weather = null;
-        if (event.getEventDate().minusHours(24).isBefore(LocalDateTime.now()) && event.getState().equals(EventState.PUBLISHED)) {
-            weather = weatherService.getCurrentWeather(event.getLocation());
-        }
-        return eventMapper.mapToEventFullWeatherDto(event, confirmedRequests, views, weather);
+        return weatherService.validateWeatherForEvent(event, confirmedRequests, views);
     }
 
     @Override

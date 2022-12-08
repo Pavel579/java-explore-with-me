@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import ru.practicum.ewm.dto.event.EventFullWeatherDto;
+import ru.practicum.ewm.dto.event.EventFullDto;
 import ru.practicum.ewm.dto.event.EventShortDto;
 import ru.practicum.ewm.service.hits.HitService;
 import ru.practicum.ewm.service.pub.PublicEventsService;
@@ -67,7 +67,7 @@ public class PublicEventsController {
     }
 
     @GetMapping("/{id}")
-    public EventFullWeatherDto getById(@PathVariable Long id, HttpServletRequest request) {
+    public EventFullDto getById(@PathVariable Long id, HttpServletRequest request) {
         hitService.sendHits(request);
         return publicEventsService.getById(id);
     }

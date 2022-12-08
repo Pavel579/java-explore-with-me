@@ -4,11 +4,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.practicum.ewm.model.Comment;
 import ru.practicum.ewm.service.admin.AdminCommentsService;
 import ru.practicum.ewm.storage.CommentRepository;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -24,8 +21,8 @@ public class AdminCommentsServiceImpl implements AdminCommentsService {
     }
 
     @Override
+    @Transactional
     public void deleteByUser(Long userId) {
-        List<Comment> comments = commentRepository.findAllByAuthorId(userId);
-        commentRepository.deleteAll(comments);
+        commentRepository.deleteAllByAuthorId(userId);
     }
 }

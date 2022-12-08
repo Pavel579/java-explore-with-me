@@ -1,9 +1,9 @@
 package ru.practicum.ewm.dto.event;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import ru.practicum.ewm.dto.category.CategoryDto;
 import ru.practicum.ewm.dto.user.UserShortDto;
 import ru.practicum.ewm.dto.weather.WeatherResponseDto;
@@ -12,28 +12,15 @@ import ru.practicum.ewm.model.Location;
 
 import java.time.LocalDateTime;
 
-@Data
+@Getter
+@Setter
+@EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
-@AllArgsConstructor
-public class EventFullWeatherDto {
-    private Long id;
-    private String annotation;
-    private CategoryDto category;
-    private Long confirmedRequests;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime createdOn = LocalDateTime.now();
-    private String description;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime eventDate;
-    private UserShortDto initiator;
-    private Location location;
-    private boolean paid;
-    private int participantLimit;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime publishedOn;
-    private boolean requestModeration;
-    private EventState state;
-    private String title;
-    private Long views;
+public class EventFullWeatherDto extends EventFullDto {
     private WeatherResponseDto weather;
+
+    public EventFullWeatherDto(Long id, String annotation, CategoryDto category, Long confirmedRequests, LocalDateTime createdOn, String description, LocalDateTime eventDate, UserShortDto initiator, Location location, boolean paid, int participantLimit, LocalDateTime publishedOn, boolean requestModeration, EventState state, String title, Long views, WeatherResponseDto weather) {
+        super(id, annotation, category, confirmedRequests, createdOn, description, eventDate, initiator, location, paid, participantLimit, publishedOn, requestModeration, state, title, views);
+        this.weather = weather;
+    }
 }

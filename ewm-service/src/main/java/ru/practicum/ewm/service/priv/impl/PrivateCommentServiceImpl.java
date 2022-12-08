@@ -31,9 +31,9 @@ public class PrivateCommentServiceImpl implements PrivateCommentService {
     @Override
     @Transactional
     public CommentDto create(Long userId, Long eventId, CommentDto commentDto) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User not found"));
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException("Event not found"));
         if (event.getState().equals(EventState.PUBLISHED)) {
+            User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User not found"));
             Comment comment = commentRepository.save(commentMapper.mapToComment(commentDto, event, user));
             return commentMapper.mapToCommentDto(comment);
         } else {
@@ -45,10 +45,10 @@ public class PrivateCommentServiceImpl implements PrivateCommentService {
     @Override
     @Transactional
     public CommentDto update(Long userId, Long eventId, CommentDto commentDto) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User not found"));
-        Event event = eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException("Event not found"));
         Comment comment = commentRepository.findById(commentDto.getId()).orElseThrow(() -> new NotFoundException("Comment not found"));
         if (comment.getAuthor().getId().equals(userId) && comment.getEvent().getId().equals(eventId)) {
+            User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User not found"));
+            Event event = eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException("Event not found"));
             commentRepository.save(commentMapper.mapToComment(commentDto, event, user));
         } else {
             throw new ValidationException("Wrong user or event");
@@ -59,7 +59,6 @@ public class PrivateCommentServiceImpl implements PrivateCommentService {
     @Override
     @Transactional
     public void delete(Long userId, Long commentId) {
-        userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User not found"));
         Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new NotFoundException("Comment not found"));
         if (userId.equals(comment.getAuthor().getId()) || userId.equals(comment.getEvent().getInitiator().getId())) {
             commentRepository.deleteById(commentId);

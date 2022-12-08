@@ -36,5 +36,5 @@ public class Comment {
     @JoinColumn(name = "author_id")
     private User author;
     @Column(name = "created", nullable = false)
-    private LocalDateTime created = LocalDateTime.now();
+    private LocalDateTime created;
 }
