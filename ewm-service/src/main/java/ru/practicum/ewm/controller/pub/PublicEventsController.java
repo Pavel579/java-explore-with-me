@@ -45,6 +45,7 @@ public class PublicEventsController {
             @PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from,
             @Positive @RequestParam(name = "size", defaultValue = "10") Integer size,
             HttpServletRequest request) {
+        log.debug("Public events controller get all");
         int page = from / size;
         PageRequest pageRequest = PageRequest.of(page, size);
         if (sort != null) {
@@ -68,6 +69,7 @@ public class PublicEventsController {
 
     @GetMapping("/{id}")
     public EventFullDto getById(@PathVariable Long id, HttpServletRequest request) {
+        log.debug("Public events controller get by id");
         hitService.sendHits(request);
         return publicEventsService.getById(id);
     }

@@ -23,17 +23,19 @@ public class PrivateRequestsController {
 
     @PostMapping()
     public ParticipationRequestDto create(@PathVariable Long userId, @RequestParam Long eventId) {
-        log.info("create request private contr");
+        log.debug("Private request controller create");
         return privateRequestsService.create(userId, eventId);
     }
 
     @GetMapping()
     public List<ParticipationRequestDto> getUserRequests(@PathVariable Long userId) {
+        log.debug("Private request controller get user request");
         return privateRequestsService.getUserRequests(userId);
     }
 
     @PatchMapping("/{requestId}/cancel")
     public ParticipationRequestDto cancel(@PathVariable Long userId, @PathVariable Long requestId) {
+        log.debug("Private requests controller cancel");
         return privateRequestsService.cancel(userId, requestId);
     }
 }

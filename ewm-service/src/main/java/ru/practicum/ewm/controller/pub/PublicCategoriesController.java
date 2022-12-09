@@ -28,6 +28,7 @@ public class PublicCategoriesController {
     public List<CategoryDto> getAll(
             @PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from,
             @Positive @RequestParam(name = "size", defaultValue = "10") Integer size) {
+        log.debug("Public categories controller get all");
         int page = from / size;
         PageRequest pageRequest = PageRequest.of(page, size);
         return publicCategoriesService.getAll(pageRequest);
@@ -35,6 +36,7 @@ public class PublicCategoriesController {
 
     @GetMapping("/{catId}")
     public CategoryDto getById(@PathVariable Long catId) {
+        log.debug("Public categories controller get by id");
         return publicCategoriesService.getById(catId);
     }
 }

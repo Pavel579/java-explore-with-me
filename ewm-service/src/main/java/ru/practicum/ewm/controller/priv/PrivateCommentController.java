@@ -28,7 +28,7 @@ public class PrivateCommentController {
     public CommentDto create(@PathVariable Long userId,
                              @RequestBody @Validated(Create.class) CommentDto commentDto,
                              @RequestParam Long eventId) {
-        log.debug("Private comments contr create");
+        log.debug("Private comments controller create");
         return privateCommentService.create(userId, eventId, commentDto);
     }
 
@@ -36,13 +36,13 @@ public class PrivateCommentController {
     public CommentDto update(@PathVariable Long userId,
                              @RequestBody @Validated(Update.class) CommentDto commentDto,
                              @RequestParam Long eventId) {
-        log.debug("Private comments contr update");
+        log.debug("Private comments controller update");
         return privateCommentService.update(userId, eventId, commentDto);
     }
 
     @DeleteMapping("/{commentId}")
     public void delete(@PathVariable Long userId, @PathVariable Long commentId) {
-        log.debug("Private comments contr delete");
+        log.debug("Private comments controller delete");
         privateCommentService.delete(userId, commentId);
     }
 

@@ -18,13 +18,13 @@ public class AdminCommentsController {
 
     @DeleteMapping("/{commentId}")
     public void delete(@PathVariable Long commentId) {
-        log.debug("Admin comments contr delete by id");
+        log.debug("Admin comments controller delete by id");
         adminCommentsService.delete(commentId);
     }
 
     @DeleteMapping
     public void deleteByUser(@RequestParam Long userId) {
-        log.debug("Admin comments contr delete by user");
+        log.debug("Admin comments controller delete by user");
         adminCommentsService.deleteByUser(userId);
     }
 }

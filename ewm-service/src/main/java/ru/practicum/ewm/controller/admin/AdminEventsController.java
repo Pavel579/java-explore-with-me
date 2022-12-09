@@ -56,16 +56,19 @@ public class AdminEventsController {
     @PutMapping("/{eventId}")
     public EventFullDto update(@PathVariable Long eventId,
                                @RequestBody AdminUpdateEventRequestDto adminUpdateEventRequestDto) {
+        log.debug("Admin events controller update");
         return adminEventsService.update(eventId, adminUpdateEventRequestDto);
     }
 
     @PatchMapping("/{eventId}/publish")
     public EventFullDto publish(@PathVariable Long eventId) {
+        log.debug("Admin events controller publish");
         return adminEventsService.publish(eventId);
     }
 
     @PatchMapping("/{eventId}/reject")
     public EventFullDto reject(@PathVariable Long eventId) {
+        log.debug("Admin events controller reject");
         return adminEventsService.reject(eventId);
     }
 }

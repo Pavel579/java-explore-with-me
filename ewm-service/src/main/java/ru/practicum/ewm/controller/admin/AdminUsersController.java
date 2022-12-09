@@ -39,6 +39,7 @@ public class AdminUsersController {
             @RequestParam(name = "ids", required = false) List<Long> ids,
             @PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from,
             @Positive @RequestParam(name = "size", defaultValue = "10") Integer size) {
+        log.debug("Admin users controller get all");
         int page = from / size;
         final PageRequest pageRequest = PageRequest.of(page, size);
         return adminUsersService.getAll(ids, pageRequest);
@@ -46,6 +47,7 @@ public class AdminUsersController {
 
     @DeleteMapping("/{userId}")
     public void deleteById(@PathVariable Long userId) {
+        log.debug("Admin users controller delete by id");
         adminUsersService.deleteById(userId);
     }
 }

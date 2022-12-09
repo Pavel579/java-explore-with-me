@@ -28,7 +28,7 @@ public class PublicCommentsController {
     public List<CommentDto> getAllForEvent(@RequestParam Long eventId,
                                    @PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from,
                                    @Positive @RequestParam(name = "size", defaultValue = "10") Integer size) {
-        log.debug("Public comments contr get all for event");
+        log.debug("Public comments controller get all for event");
         int page = from / size;
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "created"));
         return publicCommentsService.getAllForEvent(eventId, pageRequest);
