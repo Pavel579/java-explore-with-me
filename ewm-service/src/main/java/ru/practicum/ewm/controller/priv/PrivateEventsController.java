@@ -36,13 +36,14 @@ public class PrivateEventsController {
     @PostMapping()
     public EventFullDto create(@Validated(Create.class) @RequestBody NewEventDto newEventDto,
                                @PathVariable Long userId) {
-        log.debug("Create event private contr");
+        log.debug("Private events controller create");
         return privateEventsService.create(userId, newEventDto);
     }
 
     @PatchMapping()
     public EventFullDto update(@Valid @RequestBody UpdateEventRequestDto updateEventDto,
                                @PathVariable Long userId) {
+        log.debug("Private events controller update");
         return privateEventsService.update(updateEventDto, userId);
     }
 
@@ -51,6 +52,7 @@ public class PrivateEventsController {
             @PathVariable Long userId,
             @PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from,
             @Positive @RequestParam(name = "size", defaultValue = "10") Integer size) {
+        log.debug("Private events controller get by user");
         int page = from / size;
         PageRequest pageRequest = PageRequest.of(page, size);
         return privateEventsService.getByUser(userId, pageRequest);
@@ -58,30 +60,34 @@ public class PrivateEventsController {
 
     @GetMapping("/{eventId}")
     public EventFullDto getByUserIdAndEventId(@PathVariable Long userId, @PathVariable Long eventId) {
-        log.debug("get event by id contr");
+        log.debug("Private events controller get by userId and eventId");
         return privateEventsService.getByUserIdAndEventId(userId, eventId);
     }
 
     @PatchMapping("/{eventId}")
     public EventFullDto cancel(@PathVariable Long userId, @PathVariable Long eventId) {
+        log.debug("Private events controller cancel");
         return privateEventsService.cancel(userId, eventId);
     }
 
     @GetMapping("/{eventId}/requests")
     public List<ParticipationRequestDto> getParticipationRequestsOfUser(@PathVariable Long userId,
                                                                         @PathVariable Long eventId) {
+        log.debug("Private events controller get participation requests of user");
         return privateEventsService.getParticipationRequestsOfUser(userId, eventId);
     }
 
     @PatchMapping("/{eventId}/requests/{reqId}/confirm")
     public ParticipationRequestDto confirmRequest(@PathVariable Long userId, @PathVariable Long eventId,
                                                   @PathVariable Long reqId) {
+        log.debug("Private events controller confirm request");
         return privateEventsService.confirmRequest(userId, eventId, reqId);
     }
 
     @PatchMapping("/{eventId}/requests/{reqId}/reject")
     public ParticipationRequestDto rejectRequest(@PathVariable Long userId,
                                                  @PathVariable Long eventId, @PathVariable Long reqId) {
+        log.debug("Private events controller reject request");
         return privateEventsService.rejectRequest(userId, eventId, reqId);
     }
 }

@@ -24,31 +24,37 @@ public class AdminCompilationsController {
 
     @PostMapping()
     public CompilationDto create(@Valid @RequestBody NewCompilationDto newCompilationDto) {
+        log.debug("Admin compilations controller create");
         return adminCompilationsService.create(newCompilationDto);
     }
 
     @DeleteMapping("/{compId}")
     public void deleteById(@PathVariable Long compId) {
+        log.debug("Admin compilations controller delete by id");
         adminCompilationsService.deleteById(compId);
     }
 
     @DeleteMapping("/{compId}/events/{eventId}")
     public void deleteEventFromCompilation(@PathVariable Long compId, @PathVariable Long eventId) {
+        log.debug("Admin compilations controller delete event from compilation");
         adminCompilationsService.deleteEventFromCompilation(compId, eventId);
     }
 
     @PatchMapping("/{compId}/events/{eventId}")
     public void addEventToCompilation(@PathVariable Long compId, @PathVariable Long eventId) {
+        log.debug("Admin compilation controller add event to compilation");
         adminCompilationsService.addEventToCompilation(compId, eventId);
     }
 
     @DeleteMapping("/{compId}/pin")
     public void removePinned(@PathVariable Long compId) {
+        log.debug("Admin compilation controller remove pinned");
         adminCompilationsService.removePinned(compId);
     }
 
     @PatchMapping("/{compId}/pin")
     public void setPinned(@PathVariable Long compId) {
+        log.debug("Admin compilations controller set pinned");
         adminCompilationsService.setPinned(compId);
     }
 }

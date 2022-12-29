@@ -3,8 +3,10 @@ package ru.practicum.ewm.mapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import ru.practicum.ewm.dto.event.EventFullDto;
+import ru.practicum.ewm.dto.event.EventFullWeatherDto;
 import ru.practicum.ewm.dto.event.EventShortDto;
 import ru.practicum.ewm.dto.event.NewEventDto;
+import ru.practicum.ewm.dto.weather.WeatherResponseDto;
 import ru.practicum.ewm.model.Category;
 import ru.practicum.ewm.model.Event;
 import ru.practicum.ewm.model.EventState;
@@ -40,6 +42,28 @@ public class EventMapper {
                 event.getState(),
                 event.getTitle(),
                 views == null ? 0 : views
+        );
+    }
+
+    public EventFullWeatherDto mapToEventFullWeatherDto(Event event, Long confirmedRequests, Long views, WeatherResponseDto weatherResponseDto) {
+        return new EventFullWeatherDto(
+                event.getId(),
+                event.getAnnotation(),
+                categoryMapper.mapToCategoryDto(event.getCategory()),
+                confirmedRequests,
+                event.getCreatedOn(),
+                event.getDescription(),
+                event.getEventDate(),
+                userMapper.mapToUserShortDto(event.getInitiator()),
+                event.getLocation(),
+                event.isPaid(),
+                event.getParticipantLimit(),
+                event.getPublishedOn(),
+                event.isRequestModeration(),
+                event.getState(),
+                event.getTitle(),
+                views == null ? 0 : views,
+                weatherResponseDto
         );
     }
 

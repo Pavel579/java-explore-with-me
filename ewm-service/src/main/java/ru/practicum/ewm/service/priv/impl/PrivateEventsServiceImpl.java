@@ -30,6 +30,7 @@ import ru.practicum.ewm.service.admin.AdminUsersService;
 import ru.practicum.ewm.service.hits.HitService;
 import ru.practicum.ewm.service.priv.PrivateEventsService;
 import ru.practicum.ewm.service.pub.PublicCategoriesService;
+import ru.practicum.ewm.service.weather.WeatherService;
 import ru.practicum.ewm.storage.EventRepository;
 import ru.practicum.ewm.storage.LocationRepository;
 import ru.practicum.ewm.storage.RequestRepository;
@@ -56,6 +57,7 @@ public class PrivateEventsServiceImpl implements PrivateEventsService {
     private final AdminCompilationsService adminCompilationsService;
     private final PublicCategoriesService publicCategoriesService;
     private final HitService hitService;
+    private final WeatherService weatherService;
     private final UserMapper userMapper;
     private final CategoryMapper categoryMapper;
 
@@ -85,7 +87,7 @@ public class PrivateEventsServiceImpl implements PrivateEventsService {
         Event event = eventRepository.findAllByInitiatorIdAndId(userId, eventId);
         Long confirmedRequests = requestRepository.findConfirmedRequests(eventId, RequestState.CONFIRMED);
         Long views = hitService.getViewsForEvent(event, false);
-        return eventMapper.mapToEventFullDto(event, confirmedRequests, views);
+        return weatherService.validateWeatherForEvent(event, confirmedRequests, views);
     }
 
 

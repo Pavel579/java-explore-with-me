@@ -48,6 +48,7 @@ public class AdminEventsServiceImpl implements AdminEventsService {
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException("Event not found"));
         if (event.getEventDate().minusHours(1).isAfter(LocalDateTime.now()) && event.getState().equals(EventState.PENDING)) {
             event.setState(EventState.PUBLISHED);
+            event.setPublishedOn(LocalDateTime.now());
             Long confirmedRequests = requestRepository.findConfirmedRequests(event.getId(), RequestState.CONFIRMED);
             Long views = hitService.getViewsForEvent(event, false);
             return eventMapper.mapToEventFullDto(event, confirmedRequests, views);

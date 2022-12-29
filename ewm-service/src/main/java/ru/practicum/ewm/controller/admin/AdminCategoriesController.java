@@ -24,16 +24,19 @@ public class AdminCategoriesController {
 
     @PostMapping()
     public CategoryDto create(@Validated(Create.class) @RequestBody CategoryDto categoryDto) {
+        log.debug("Admin contr create category");
         return adminCategoriesService.create(categoryDto);
     }
 
     @PatchMapping()
     public CategoryDto update(@Validated(Update.class) @RequestBody CategoryDto categoryDto) {
+        log.debug("Admin contr update category");
         return adminCategoriesService.update(categoryDto);
     }
 
     @DeleteMapping("/{catId}")
     public void deleteById(@PathVariable Long catId) {
+        log.debug("Admin contr delete category");
         adminCategoriesService.deleteById(catId);
     }
 }
